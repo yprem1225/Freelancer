@@ -23,14 +23,19 @@ public class SignupServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		
 		User user = new User();
-		user.setName(request.getParameter("name").trim());
+		user.setName(request.getParameter("name"));
 		user.setEmail(request.getParameter("email").trim());
 		user.setPassword(request.getParameter("password").trim());
 		user.setRole(request.getParameter("role"));
 		
 		UserService service = new UserService();
 		
+		//Debug
+		System.out.println("name"+user.getName());
+		System.out.println("email"+user.getEmail());
+		System.out.println("password"+user.getPassword());
 		try {
+			
 			if(service.isEmailExist(user.getEmail())) {
 				  request.setAttribute("error", "Account with this email already exists");
 	                request.getRequestDispatcher("signup.jsp").forward(request, response);
