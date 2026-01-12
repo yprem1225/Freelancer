@@ -25,19 +25,26 @@ public class UserService {
 		public void registerUser(User user) throws ClassNotFoundException, SQLException {
 			Connection connection = DBConnection.getConnection();
 			 String sql = "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)";
-			 PreparedStatement preparedStatement = connection.prepareStatement(sql);
+			 PreparedStatement preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 			 preparedStatement.setString(1, user.getName());
 			 preparedStatement.setString(2, user.getEmail());
 			 preparedStatement.setString(3, user.getPassword());
 			 preparedStatement.setString(4, user.getRole());
 			 preparedStatement.executeUpdate();
+			 
+			 ResultSet generatedkeys=preparedStatement.getGeneratedKeys();
+			 if(generatedkeys.next()) {
+				 int id=generatedkeys.getInt(1);
+				 user.setId(id);
+				 
+			 }
 		}
 		
 		
 		//login
 		public User login(String email, String password) throws ClassNotFoundException, SQLException {
 			Connection connection = DBConnection.getConnection();
-			String sql = "SELECT name, email, role FROM users WHERE email=? AND password=?";
+			String sql = "SELECT id,name, email, role FROM users WHERE email=? AND password=?";
 			PreparedStatement preparedStatement = connection.prepareStatement(sql);
 			preparedStatement.setString(1, email);
 			preparedStatement.setString(2, password);
@@ -46,6 +53,7 @@ public class UserService {
 			
 			if(rs.next()) {
 				User user = new User();
+				  user.setId(rs.getInt("id"));
 				  user.setName(rs.getString("name"));
 		          user.setEmail(rs.getString("email"));
 		          user.setRole(rs.getString("role"));

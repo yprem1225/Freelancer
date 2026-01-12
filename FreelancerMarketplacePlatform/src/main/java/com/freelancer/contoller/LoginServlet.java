@@ -29,8 +29,10 @@ public class LoginServlet extends HttpServlet {
         UserService service = new UserService();
         
         
+        
         try {
 			User user = service.login(email, password);
+			
 		
 			
 			
@@ -49,11 +51,18 @@ public class LoginServlet extends HttpServlet {
 	                return;
 			}
 			
+			
 			 HttpSession session = request.getSession();
+			 	session.setAttribute("id", user.getId());
 	            session.setAttribute("name", user.getName());
 	            session.setAttribute("email", user.getEmail());
 	            session.setAttribute("role", user.getRole());
+	            
+	            System.out.println("DB ROLE = " + user.getId());
+	            System.out.println("FORM ROLE = " + selectedRole);
 
+	            System.out.println("Registration successful, redirecting to home.jsp");
+	            
 	            response.sendRedirect("home.jsp");
 
 		} catch (ClassNotFoundException | SQLException e) {

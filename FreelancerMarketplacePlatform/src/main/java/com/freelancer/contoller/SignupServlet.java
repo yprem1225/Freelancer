@@ -47,11 +47,14 @@ public class SignupServlet extends HttpServlet {
 			service.registerUser(user);
 			
 			HttpSession httpSession = request.getSession();
+			httpSession.setAttribute("id", user.getId());
 			httpSession.setAttribute("name", user.getName());
 			httpSession.setAttribute("email", user.getEmail());
 	        httpSession.setAttribute("role", user.getRole());
 	        
-	        response.sendRedirect("home.jsp");
+	        System.out.println("Registration successful, redirecting to home.jsp");
+	        
+	       response.sendRedirect("home.jsp");
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
