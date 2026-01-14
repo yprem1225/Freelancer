@@ -8,7 +8,7 @@ public class ClientProfile {
 	
 	private String phone;
 	private String companyname;
-	private String companubio;
+	private String companybio;
 	private String completedprofile;
 	
 	public void setCompletedprofile(String completedprofile) {
@@ -50,11 +50,11 @@ public class ClientProfile {
 	public void setCompanyname(String companyname) {
 		this.companyname = companyname;
 	}
-	public String getCompanubio() {
-		return companubio;
+	public String getCompanybio() {
+		return companybio;
 	}
-	public void setCompanubio(String companubio) {
-		this.companubio = companubio;
+	public void setCompanybio(String companybio) {
+		this.companybio = companybio;
 	}
 	public String getCompletedprofile() {
 		return completedprofile;

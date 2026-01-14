@@ -9,16 +9,21 @@
         return;
     }
 
-    int completed = 40; // base completion
+    int completed = 40;
     if (profile.getPhone() != null && !profile.getPhone().isEmpty()) completed += 20;
     if (profile.getCompanyname() != null && !profile.getCompanyname().isEmpty()) completed += 20;
-    if (profile.getCompanubio() != null && !profile.getCompanubio().isEmpty()) completed += 20;
+    if (profile.getCompanybio() != null && !profile.getCompanybio().isEmpty()) completed += 20;
 %>
 
 <!DOCTYPE html>
 <html>
 <head>
     <title>Home</title>
+
+    <!-- intl-tel-input CSS -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css"/>
+
     <style>
         body { font-family: Arial; margin: 0; background: #f5f5f5; }
 
@@ -54,7 +59,7 @@
             padding: 15px;
         }
 
-        .dropdown input, .dropdown textarea, .dropdown select {
+        .dropdown input, .dropdown textarea {
             width: 100%;
             padding: 8px;
             margin: 6px 0;
@@ -74,36 +79,39 @@
         }
     </style>
 
+    <!-- intl-tel-input JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"></script>
+
     <script>
         function toggleDropdown() {
             var d = document.getElementById("profileDropdown");
             d.style.display = d.style.display === "block" ? "none" : "block";
         }
 
-        // Pre-select country code based on existing phone
-        function initPhone() {
-            var phoneInput = document.getElementById("phone");
-            var countrySelect = document.getElementById("countryCode");
+        let iti;
 
-            if (phoneInput.value) {
-                var match = phoneInput.value.match(/^\+(\d{1,3})/);
-                if (match) {
-                    countrySelect.value = "+" + match[1];
-                    phoneInput.value = phoneInput.value.replace(/^\+\d{1,3}/, "");
-                }
-            }
-        }
+        window.onload = function () {
+            const phoneInput = document.querySelector("#phone");
 
-        function combinePhone() {
-            var phoneInput = document.getElementById("phone");
-            var countrySelect = document.getElementById("countryCode");
-            phoneInput.value = countrySelect.value + phoneInput.value;
-        }
+            iti = window.intlTelInput(phoneInput, {
+                initialCountry: "auto",
+                separateDialCode: true,
+                utilsScript:
+                  "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
+            });
 
-        window.onload = function() {
-            initPhone();
+            // Pre-fill phone if exists
+            <% if (profile.getPhone() != null && !profile.getPhone().isEmpty()) { %>
+                iti.setNumber("<%= profile.getPhone() %>");
+            <% } %>
         };
+
+        function preparePhone() {
+            document.getElementById("phone").value = iti.getNumber();
+        }
     </script>
+
 </head>
 <body>
 
@@ -130,35 +138,23 @@
     <label>Role</label>
     <input class="readonly" readonly value="<%= profile.getRole() %>">
 
-    <form action="ClientProfileServlet" method="post" onsubmit="combinePhone()">
-        <label>Country Code</label>
-        <select id="countryCode" name="countryCode">
-            <option value="+91">India (+91)</option>
-            <option value="+1">USA (+1)</option>
-            <option value="+44">UK (+44)</option>
-            <option value="+61">Australia (+61)</option>
-            <option value="+81">Japan (+81)</option>
-            <option value="+49">Germany (+49)</option>
-            <!-- Add more countries here -->
-        </select>
+    <form action="ClientProfileServlet" method="post" onsubmit="preparePhone()">
 
         <label>Phone</label>
-        <input id="phone" name="phone"
-               pattern="\+\d{1,3}\d{6,12}"
-               placeholder="Enter phone number" required
-               value="<%= profile.getPhone() == null ? "" : profile.getPhone() %>">
+        <input id="phone" name="phone" type="tel" required>
 
         <label>Company Name</label>
-        <input name="companyname" value="<%= profile.getCompanyname() == null ? "" : profile.getCompanyname() %>">
+        <input name="companyname"
+               value="<%= profile.getCompanyname() == null ? "" : profile.getCompanyname() %>">
 
         <label>Company Bio</label>
-        <textarea name="companubio"><%= profile.getCompanubio() == null ? "" : profile.getCompanubio() %></textarea>
+        <textarea name="companybio"><%= profile.getCompanybio() == null ? "" : profile.getCompanybio() %></textarea>
 
         <button type="submit">Save Profile</button>
     </form>
 
     <p style="margin-top:10px; color:red;">
-        Profile Completed: <%= completed %>% 
+        Profile Completed: <%= completed %>%
         <% if (completed < 100) { %> – Please complete remaining details <% } %>
     </p>
 

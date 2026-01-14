@@ -45,8 +45,35 @@ public class ClientProfileServlet extends HttpServlet {
 
 	
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
-		doGet(request, response);
+		HttpSession httpSession = request.getSession(false);
+		
+		if(httpSession==null || httpSession.getAttribute("id")==null) {
+			response.sendRedirect("login.jsp");
+			return;
+		}
+		
+		int id =(int) httpSession.getAttribute("id");
+		
+		//get from input
+		String phone=request.getParameter("phone");
+		String companyName=request.getParameter("companyname");
+		String companyBio=request.getParameter("companybio");
+		
+		//Set the values
+		ClientProfile profile = new ClientProfile();
+		profile.setId(id);
+		profile.setPhone(phone);
+		profile.setCompanyname(companyName);
+		profile.setCompanybio(companyBio);
+		
+		ClientService service = new ClientService();
+		try {
+			service.updateProfile(profile);
+			 response.sendRedirect("ClientProfileServlet"); // redirect to refresh data
+		} catch (ClassNotFoundException | SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
