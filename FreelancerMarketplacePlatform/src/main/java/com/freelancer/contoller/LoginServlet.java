@@ -57,6 +57,7 @@ public class LoginServlet extends HttpServlet {
 	            session.setAttribute("name", user.getName());
 	            session.setAttribute("email", user.getEmail());
 	            session.setAttribute("role", user.getRole());
+	            session.removeAttribute("jobId");
 	            
 	            System.out.println("DB ROLE = " + user.getId());
 	            System.out.println("FORM ROLE = " + selectedRole);

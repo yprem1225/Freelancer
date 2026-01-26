@@ -1,158 +1,103 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
 <head>
-<title>Post Job – Description</title>
-
-<style>
-    body {
-        margin: 0;
-        font-family: Arial, sans-serif;
-        background: #fff;
-    }
-
-    .container {
-        max-width: 1200px;
-        margin: auto;
-        padding: 30px 40px;
-        height: 100vh;
-        box-sizing: border-box;
-    }
-
-    .reminder {
-        background: #eef6ff;
-        padding: 12px 16px;
-        border-radius: 8px;
-        color: #004aad;
-        font-size: 14px;
-        margin-bottom: 25px;
-    }
-
-    .step {
-        font-size: 14px;
-        color: #666;
-        margin-bottom: 10px;
-    }
-
-    .layout {
-        display: flex;
-        gap: 70px;
-        margin-top: 25px;
-    }
-
-    .left {
-        width: 40%;
-    }
-
-    .right {
-        width: 60%;
-    }
-
-    h1 {
-        font-size: 32px;
-        margin-bottom: 12px;
-    }
-
-    textarea {
-        width: 100%;
-        height: 260px;
-        padding: 14px;
-        font-size: 15px;
-        border-radius: 10px;
-        border: 2px solid #ccc;
-        resize: none;
-    }
-
-    textarea:focus {
-        border-color: #14a800;
-        outline: none;
-    }
-
-    .error {
-        color: #d93025;
-        font-size: 13px;
-        display: none;
-    }
-
-    .footer {
-        position: absolute;
-        bottom: 30px;
-        left: 40px;
-        right: 40px;
-        display: flex;
-        justify-content: space-between;
-    }
-
-    button {
-        padding: 12px 34px;
-        border-radius: 25px;
-        border: none;
-        font-size: 15px;
-        cursor: pointer;
-    }
-
-    .back {
-        background: #eee;
-    }
-
-    .submit {
-        background: #14a800;
-        color: white;
-    }
-</style>
-
-<script>
-    function validateForm() {
-        const desc = document.getElementById("description");
-        const error = document.getElementById("error");
-
-        if (desc.value.trim().length < 50) {
-            error.style.display = "block";
-            return false;
+    <title>Post Job - Project Description</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 0;
         }
-        return true;
-    }
-</script>
 
+        .container {
+            width: 70%;
+            margin: 40px auto;
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #555;
+            font-size: 14px;
+        }
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 20px;
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .btn-container {
+            text-align: right;
+            margin-top: 30px;
+        }
+
+        .submit-btn {
+            background-color: #28a745;
+            color: #fff;
+            border: none;
+            padding: 10px 25px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
+    <h2>Project Description</h2>
+    <p>
+        Describe your project clearly so freelancers understand your requirements.
+        (Clear description = better proposals 👍)
+    </p>
 
-    <div class="reminder">
-        💡 Just a reminder to publish your job post, you'll need to verify your phone number
-    </div>
+    <form action="home.jsp" method="post">
 
-    <div class="step">5/5 &nbsp; Job post</div>
+        <label for="description">Project Description</label>
+        <textarea id="description" name="description"
+                  placeholder="Explain your project in detail..."></textarea>
 
-    <div class="layout">
+        <label for="requirements">Key Requirements</label>
+        <textarea id="requirements" name="requirements"
+                  placeholder="Mention skills, tools, technologies, or expectations"></textarea>
 
-        <!-- LEFT -->
-        <div class="left">
-            <h1>Start the conversation.</h1>
-            <p>Describe your project clearly so freelancers understand your needs.</p>
+        <label for="deliverables">Expected Deliverables</label>
+        <textarea id="deliverables" name="deliverables"
+                  placeholder="What should be delivered at the end of the project?"></textarea>
+
+        <div class="btn-container">
+            <button type="submit" class="submit-btn">Submit Job</button>
         </div>
 
-        <!-- RIGHT -->
-        <form class="right" action="PostJobServlet" method="post" onsubmit="return validateForm()">
-
-            <label><b>Describe what you need</b></label><br><br>
-
-            <textarea id="description" name="description"
-                placeholder="Describe your project here..."></textarea>
-
-            <div id="error" class="error">
-                Description must be at least 50 characters.
-            </div>
-
-            <div class="footer">
-                <button type="button" class="back" onclick="history.back()">Back</button>
-                <button type="submit" class="submit">Submit</button>
-            </div>
-
-        </form>
-
-    </div>
+    </form>
 </div>
 
 </body>
