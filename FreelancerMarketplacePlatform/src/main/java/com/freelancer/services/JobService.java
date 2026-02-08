@@ -51,8 +51,52 @@ public class JobService {
     	
     	
 		return "" ;
+	}
+    
+    public Job getJobById(int jobId) throws SQLException {
+    	Job job = new Job();
+    	try {
+			Connection con = DBConnection.getConnection();
+			String sql= "SELECT * FROM jobs WHERE job_id=?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, jobId);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				job.setJobId(jobId);
+				job.setComplexity(rs.getString("complexity"));
+				job.setDuration(rs.getString("duration"));
+				job.setFreelancerLevel(rs.getString("freelancer_level"));
+			}
+
+    	} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return job;
+	}
+    
+    public void updateJobDetails(Job job) throws SQLException {
+    	try {
+			Connection connection = DBConnection.getConnection();
+			String sql = "UPDATE jobs SET complexity=?, duration=?, freelancer_level=? WHERE job_id=?";
+			PreparedStatement ps = connection.prepareStatement(sql);
+			
+			    ps.setString(1, job.getComplexity());
+	            ps.setString(2, job.getDuration());
+	            ps.setString(3, job.getFreelancerLevel());
+	            ps.setInt(4, job.getJobId());
+	            ps.executeUpdate();
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 
 	}
+    
+    
 
 }
