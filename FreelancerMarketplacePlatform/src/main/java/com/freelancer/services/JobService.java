@@ -93,9 +93,46 @@ public class JobService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+    
+    public Integer getBudgetById(int jobId) throws SQLException {
+    	 Integer budget = null;
+    	try {
+			Connection con = DBConnection.getConnection();
+			
+			String sql =  "SELECT budget FROM jobs WHERE job_id = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			
+			ps.setInt(1, jobId); 
+			ResultSet rs = ps.executeQuery();
+			if(rs.next()) {
+				budget= rs.getInt("budget");
+			}
+			
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+		return budget;
+	}
+    
+    public void updateJobBudget(int jobId , int budget) throws ClassNotFoundException, SQLException {
 		
+    	Connection con = DBConnection.getConnection();
+    	
+    	String sql = "UPDATE jobs SET budget = ? WHERE job_id = ?";
+    	PreparedStatement ps = con.prepareStatement(sql);
+    	
+    	ps.setInt(1, budget);
+    	ps.setInt(2, jobId);
+    	
+    	ps.executeUpdate();
 
 	}
+    
+
     
     
 

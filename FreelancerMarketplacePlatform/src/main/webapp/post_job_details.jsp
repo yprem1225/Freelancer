@@ -37,7 +37,8 @@
         <div class="card-group">
             <label class="card">
                 <input type="radio" name="complexity" value="Small"
-                    ${job.complexity == 'Small' ? 'checked' : ''}>
+                    ${job.complexity == 'Small' ? 'checked' : ''}
+                    required>
                 <b>Small</b><br>
                 Quick and straightforward tasks
             </label>
@@ -61,7 +62,8 @@
         <div class="card-group">
             <label class="card">
                 <input type="radio" name="duration" value="Less than 1 month"
-                    ${job.duration == 'Less than 1 month' ? 'checked' : ''}>
+                    ${job.duration == 'Less than 1 month' ? 'checked' : ''}
+                    required>
                 Less than 1 month
             </label>
 
@@ -82,7 +84,8 @@
         <div class="card-group">
             <label class="card">
                 <input type="radio" name="freelancerLevel" value="Fresher"
-                    ${job.freelancerLevel == 'Fresher' ? 'checked' : ''}>
+                    ${job.freelancerLevel == 'Fresher' ? 'checked' : ''}
+                    required>
                 Fresher – Entry level
             </label>
 
