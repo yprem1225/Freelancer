@@ -76,7 +76,7 @@ public class JobService {
 		}
 		return job;
 	}
-    
+    // to come back and update job details
     public void updateJobDetails(Job job) throws SQLException {
     	try {
 			Connection connection = DBConnection.getConnection();
@@ -94,7 +94,7 @@ public class JobService {
 			e.printStackTrace();
 		}
 	}
-    
+    // to get jobBudget when hit back button  
     public Integer getBudgetById(int jobId) throws SQLException {
     	 Integer budget = null;
     	try {
@@ -117,7 +117,7 @@ public class JobService {
     	
 		return budget;
 	}
-    
+    // to press back and update jobbudget
     public void updateJobBudget(int jobId , int budget) throws ClassNotFoundException, SQLException {
 		
     	Connection con = DBConnection.getConnection();
@@ -132,8 +132,73 @@ public class JobService {
 
 	}
     
+    //to get description from DB
+    public String getDescriptionById(int JobId) throws SQLException {
+    	
+    	try {
+			Connection con = DBConnection.getConnection();
+			String sql = "SELECT description FROM jobs WHERE job_id = ?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			ps.setInt(1, JobId);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			if(rs.next()) {
+				return rs.getString("description");
+			}
+			
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	
 
+	}
     
+
+    //to update,insert description and change status to active
+    
+    public void updateDescriptionAndActivate(int jobId , String description ) throws SQLException {
+		
+    	try {
+			Connection con = DBConnection.getConnection();
+			String sql = "UPDATE jobs SET description = ?, status = 'active' WHERE job_id = ?";
+			
+			PreparedStatement ps = con.prepareStatement(sql);
+			
+			ps.setString(1, description);
+			ps.setInt(2, jobId);
+			
+			ps.executeUpdate();
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+	}
+    
+    // to check whether profile is completed before post jon
+    
+    public boolean isProfileCompleted(int clientId) throws SQLException {
+    	
+    	Connection con;
+		try {
+			con = DBConnection.getConnection();
+			String sql = "SELECT profile_completed FROM clients WHERE user_id = ?";
+	    	PreparedStatement ps = con.prepareStatement(sql);
+	    	ps.setInt(1, clientId);
+	    	
+	    	ResultSet rs = ps.executeQuery();
+	    	if (rs.next()) {
+	    		return rs.getInt("profile_completed")==100; // if 100 = 100 return true or else false 
+			}
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
     
 
 }

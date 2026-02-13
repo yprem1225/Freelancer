@@ -2,6 +2,7 @@ package com.freelancer.contoller;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Enumeration;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -31,7 +32,13 @@ public class PostJobBudgetServlet extends HttpServlet {
 	            response.sendRedirect(request.getContextPath() + "/ClientProfileServlet");
 	            return;
 	        }
-	        
+	        if (session != null) {
+	            Enumeration<String> names = session.getAttributeNames();
+	            while (names.hasMoreElements()) {
+	                String name = names.nextElement();
+	                System.out.println(name + " : " + session.getAttribute(name));
+	            }
+	        }
 	        request.setAttribute("jobId", jobId);
 	        
 	        JobService service = new JobService();

@@ -33,7 +33,6 @@
             background: #f4f6f8;
         }
 
-        /* HEADER */
         .header {
             display: flex;
             justify-content: space-between;
@@ -43,7 +42,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        /* POST JOB BUTTON */
         .post-job-btn {
             background: #28a745;
             color: #fff;
@@ -60,7 +58,6 @@
             cursor: not-allowed;
         }
 
-        /* PROFILE ICON */
         .profile-icon {
             width: 42px;
             height: 42px;
@@ -74,7 +71,6 @@
             cursor: pointer;
         }
 
-        /* DROPDOWN */
         .dropdown {
             position: absolute;
             top: 75px;
@@ -127,6 +123,31 @@
             border-left: 5px solid #ffc107;
             font-size: 15px;
         }
+
+        /* ✅ SUCCESS POPUP (TOP CENTER, 3 SEC, ANIMATED) */
+        .success-popup {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: #28a745;
+            color: #fff;
+            padding: 14px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            z-index: 5000;
+            opacity: 0;
+            animation: slideFade 3s forwards;
+        }
+
+        @keyframes slideFade {
+            0%   { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+            15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+            85%  { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        }
     </style>
 
     <!-- intl-tel-input JS -->
@@ -152,6 +173,15 @@
             <% if (profile.getPhone() != null && !profile.getPhone().isEmpty()) { %>
                 iti.setNumber("<%= profile.getPhone() %>");
             <% } %>
+
+            // Remove popup after 3 seconds
+            const popup = document.getElementById("successPopup");
+            if (popup) {
+                setTimeout(function () {
+                    popup.remove();
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }, 3000);
+            }
         };
 
         function preparePhone() {
@@ -166,23 +196,26 @@
 
 <body>
 
-<!-- HEADER -->
+<!-- ✅ SUCCESS POPUP -->
+<% if ("1".equals(request.getParameter("success"))) { %>
+    <div class="success-popup" id="successPopup">
+        ✅ Job posted successfully!
+    </div>
+<% } %>
+
 <div class="header">
 
-    <!-- POST JOB -->
     <% if (profileComplete) { %>
         <a href="post_job_title.jsp" class="post-job-btn">+ Post Job</a>
     <% } else { %>
         <span class="post-job-btn disabled" onclick="blockPostJob()">+ Post Job</span>
     <% } %>
 
-    <!-- PROFILE ICON -->
     <div class="profile-icon" onclick="toggleDropdown()">
         <%= profile.getName().substring(0,1).toUpperCase() %>
     </div>
 </div>
 
-<!-- WARNING -->
 <% if (!profileComplete) { %>
     <div class="warning">
         Your profile is <b><%= completed %>%</b> complete.
@@ -190,7 +223,6 @@
     </div>
 <% } %>
 
-<!-- PROFILE DROPDOWN -->
 <div class="dropdown" id="profileDropdown">
 
     <h3>Profile</h3>
