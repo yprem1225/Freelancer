@@ -35,7 +35,7 @@ public class ClientProfileServlet extends HttpServlet {
 		try {
 			ClientProfile profile = service.getProfile(id);
 			request.setAttribute("profile", profile);
-            request.getRequestDispatcher("home.jsp").forward(request, response);
+            request.getRequestDispatcher("profile.jsp").forward(request, response);
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

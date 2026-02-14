@@ -25,7 +25,7 @@ public class PostJobDescriptionServlet extends HttpServlet {
 
         HttpSession session = request.getSession(false);
         if (session == null || session.getAttribute("jobId") == null) {
-            response.sendRedirect(request.getContextPath() + "/ClientProfileServlet");
+            response.sendRedirect(request.getContextPath() + "/ClientHomeServlet");
             return;
         }
 
@@ -58,7 +58,7 @@ public class PostJobDescriptionServlet extends HttpServlet {
 		 HttpSession session = request.getSession(false);
 
 	        if (session == null || session.getAttribute("jobId") == null) {
-	            response.sendRedirect("ClientProfileServlet");
+	            response.sendRedirect("ClientHomeServlet");
 	            return;
 	        }
 	        
@@ -79,7 +79,7 @@ public class PostJobDescriptionServlet extends HttpServlet {
 	        session.removeAttribute("budget");
 
 	        // Redirect with success flag
-	        response.sendRedirect(request.getContextPath() + "/ClientProfileServlet?success=1");
+	        response.sendRedirect(request.getContextPath() + "/ClientHomeServlet?success=1");
 	
 	}
 }

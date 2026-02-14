@@ -64,7 +64,7 @@ public class LoginServlet extends HttpServlet {
 
 	            System.out.println("Registration successful, redirecting to home.jsp");
 	            
-	            response.sendRedirect("ClientProfileServlet");
+	            response.sendRedirect("ClientHomeServlet");
 
 
 		} catch (ClassNotFoundException | SQLException e) {

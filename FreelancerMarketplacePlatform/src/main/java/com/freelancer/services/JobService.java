@@ -1,6 +1,9 @@
 package com.freelancer.services;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.model.Job;
 import com.util.DBConnection;
 
@@ -53,7 +56,8 @@ public class JobService {
 		return "" ;
 	}
     
-    public Job getJobById(int jobId) throws SQLException {
+    @SuppressWarnings("unchecked")
+	public Job getJobById(int jobId) throws SQLException {
     	Job job = new Job();
     	try {
 			Connection con = DBConnection.getConnection();
@@ -65,9 +69,17 @@ public class JobService {
 			
 			if(rs.next()) {
 				job.setJobId(jobId);
+				job.setUserId(rs.getInt("user_id"));
+		        job.setTitle(rs.getString("title"));
 				job.setComplexity(rs.getString("complexity"));
 				job.setDuration(rs.getString("duration"));
 				job.setFreelancerLevel(rs.getString("freelancer_level"));
+				job.setBudget(rs.getString("budget"));
+		        job.setDescription(rs.getString("description"));
+		        job.setStatus(rs.getString("status"));
+
+		        JobSkillService skillService = new JobSkillService();
+		        job.setSkills(skillService.getSkillsByJobId(jobId));
 			}
 
     	} catch (ClassNotFoundException e) {
@@ -178,7 +190,7 @@ public class JobService {
     	
 	}
     
-    // to check whether profile is completed before post jon
+    // to check whether profile is completed before post job
     
     public boolean isProfileCompleted(int clientId) throws SQLException {
     	
@@ -199,6 +211,100 @@ public class JobService {
 		}
 		return false;
 	}
+    
+    //to get active jobs
+    
+    @SuppressWarnings("unchecked")
+	public List<Job> getActiveJobsByUser(int id) throws SQLException {
+    	List<Job> jobs = new ArrayList<Job>();
+    	
+    	try {
+			Connection con = DBConnection.getConnection();
+			
+			String sql = "SELECT * FROM jobs WHERE status='active' AND user_id=?";
+			PreparedStatement ps = con.prepareStatement(sql);
+			
+			ps.setInt(1,id);
+			
+			ResultSet rs = ps.executeQuery();
+			
+			JobSkillService skillservice = new JobSkillService();
+			
+			while (rs.next()) {
+
+	            Job job = new Job();
+	            job.setJobId(rs.getInt("job_id"));
+	            job.setUserId(rs.getInt("user_id"));
+	            job.setTitle(rs.getString("title"));
+	            job.setComplexity(rs.getString("complexity"));
+	            job.setDuration(rs.getString("duration"));
+	            job.setFreelancerLevel(rs.getString("freelancer_level"));
+	            job.setBudget(rs.getString("budget"));
+	            job.setDescription(rs.getString("description"));
+	            job.setStatus(rs.getString("status"));
+
+	            // 👇 attach skills
+	            job.setSkills(skillservice.getSkillsByJobId(job.getJobId()));
+	            
+
+	            jobs.add(job);
+	        }
+			
+			System.out.println("Active jobs found: " + jobs.size()); // DEBUG
+
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return jobs;
+	}
+    
+    
+    // to delete active jobs
+    
+    public void deleteJobById(int jobId) throws ClassNotFoundException, SQLException {
+    	
+    	Connection con = DBConnection.getConnection();
+    	
+    	// First delete skills (important because of foreign key)
+    	 String sql =  "DELETE FROM job_skills WHERE job_id=?";
+    	 PreparedStatement ps1 = con.prepareStatement(sql);
+         ps1.setInt(1, jobId);
+         ps1.executeUpdate();
+         
+         // Then delete job
+         String deleteJob = "DELETE FROM jobs WHERE job_id=?";
+         PreparedStatement ps2 = con.prepareStatement(deleteJob);
+         ps2.setInt(1, jobId);
+         ps2.executeUpdate();
+	}
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
     
 
 }

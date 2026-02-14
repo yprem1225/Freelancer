@@ -48,6 +48,7 @@ public class JobSkillService {
 		} 
 	}
 	
+	
 	@SuppressWarnings("rawtypes")
 	public List getSkillsByJobId(int jobId) {
         List<JobSkill> list = new ArrayList<>();

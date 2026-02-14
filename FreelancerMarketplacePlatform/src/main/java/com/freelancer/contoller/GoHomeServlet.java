@@ -28,6 +28,6 @@ public class GoHomeServlet extends HttpServlet {
         System.out.println("=== GoHomeServlet END ===");
         
         // Go to home.jsp WITHOUT triggering login checks
-        response.sendRedirect(request.getContextPath() + "/ClientProfileServlet");
+        response.sendRedirect(request.getContextPath() + "/ClientHomeServlet");
     }
 }

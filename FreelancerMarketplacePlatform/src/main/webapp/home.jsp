@@ -1,5 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="com.model.ClientProfile" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.model.Job" %>
+<%@ page import="com.model.JobSkill" %>
 
 <%
     ClientProfile profile = (ClientProfile) request.getAttribute("profile");
@@ -21,10 +24,6 @@
 <html>
 <head>
     <title>Client Home</title>
-
-    <!-- intl-tel-input -->
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/css/intlTelInput.css"/>
 
     <style>
         body {
@@ -48,7 +47,6 @@
             padding: 10px 18px;
             border-radius: 6px;
             font-size: 16px;
-            cursor: pointer;
             text-decoration: none;
             font-weight: bold;
         }
@@ -69,51 +67,7 @@
             justify-content: center;
             font-size: 20px;
             cursor: pointer;
-        }
-
-        .dropdown {
-            position: absolute;
-            top: 75px;
-            right: 30px;
-            width: 360px;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            display: none;
-            padding: 16px;
-            z-index: 1000;
-        }
-
-        .dropdown label {
-            font-size: 14px;
-            margin-top: 6px;
-            display: block;
-        }
-
-        .dropdown input, .dropdown textarea {
-            width: 100%;
-            padding: 8px;
-            margin-top: 4px;
-        }
-
-        .readonly {
-            background: #eee;
-        }
-
-        .dropdown button {
-            margin-top: 10px;
-            background: #007bff;
-            color: #fff;
-            padding: 10px;
-            border: none;
-            width: 100%;
-            cursor: pointer;
-        }
-
-        .completion {
-            margin-top: 10px;
-            font-size: 14px;
-            color: <%= profileComplete ? "green" : "red" %>;
+            text-decoration: none;
         }
 
         .warning {
@@ -124,84 +78,48 @@
             font-size: 15px;
         }
 
-        /* ✅ SUCCESS POPUP (TOP CENTER, 3 SEC, ANIMATED) */
-        .success-popup {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%) translateY(-20px);
-            background: #28a745;
-            color: #fff;
-            padding: 14px 30px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            z-index: 5000;
-            opacity: 0;
-            animation: slideFade 3s forwards;
+        .jobs-container {
+            padding: 30px;
         }
 
-        @keyframes slideFade {
-            0%   { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-            15%  { opacity: 1; transform: translateX(-50%) translateY(0); }
-            85%  { opacity: 1; transform: translateX(-50%) translateY(0); }
-            100% { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+        .job-card {
+            background: #fff;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
         }
+
+        .job-card h3 {
+            margin: 0 0 10px 0;
+        }
+
+        .job-card a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .skill-tag {
+            background: #e3f2fd;
+            padding: 5px 10px;
+            margin-right: 5px;
+            border-radius: 20px;
+            font-size: 12px;
+            display: inline-block;
+            margin-top: 5px;
+        }
+
     </style>
 
-    <!-- intl-tel-input JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/intlTelInput.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"></script>
-
     <script>
-        function toggleDropdown() {
-            const d = document.getElementById("profileDropdown");
-            d.style.display = (d.style.display === "block") ? "none" : "block";
-        }
-
-        let iti;
-        window.onload = function () {
-            const phoneInput = document.querySelector("#phone");
-            iti = window.intlTelInput(phoneInput, {
-                separateDialCode: true,
-                initialCountry: "auto",
-                utilsScript:
-                    "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.19/js/utils.js"
-            });
-
-            <% if (profile.getPhone() != null && !profile.getPhone().isEmpty()) { %>
-                iti.setNumber("<%= profile.getPhone() %>");
-            <% } %>
-
-            // Remove popup after 3 seconds
-            const popup = document.getElementById("successPopup");
-            if (popup) {
-                setTimeout(function () {
-                    popup.remove();
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }, 3000);
-            }
-        };
-
-        function preparePhone() {
-            document.getElementById("phone").value = iti.getNumber();
-        }
-
         function blockPostJob() {
             alert("Complete your profile (100%) before posting a job.");
         }
     </script>
+
 </head>
 
 <body>
-
-<!-- ✅ SUCCESS POPUP -->
-<% if ("1".equals(request.getParameter("success"))) { %>
-    <div class="success-popup" id="successPopup">
-        ✅ Job posted successfully!
-    </div>
-<% } %>
 
 <div class="header">
 
@@ -211,9 +129,10 @@
         <span class="post-job-btn disabled" onclick="blockPostJob()">+ Post Job</span>
     <% } %>
 
-    <div class="profile-icon" onclick="toggleDropdown()">
+    <a href="ClientProfileServlet" class="profile-icon">
         <%= profile.getName().substring(0,1).toUpperCase() %>
-    </div>
+    </a>
+
 </div>
 
 <% if (!profileComplete) { %>
@@ -223,42 +142,72 @@
     </div>
 <% } %>
 
-<div class="dropdown" id="profileDropdown">
+<!-- ================= ACTIVE JOBS SECTION ================= -->
 
-    <h3>Profile</h3>
+<div class="jobs-container">
 
-    <p><b>User ID:</b> <%= profile.getId() %></p>
+    <h2>Active Jobs</h2>
 
-    <label>Name</label>
-    <input class="readonly" readonly value="<%= profile.getName() %>">
+    <%
+        List<Job> activeJobs = (List<Job>) request.getAttribute("activeJobs");
+    %>
 
-    <label>Email</label>
-    <input class="readonly" readonly value="<%= profile.getEmail() %>">
+    <% if (activeJobs == null || activeJobs.isEmpty()) { %>
 
-    <label>Role</label>
-    <input class="readonly" readonly value="<%= profile.getRole() %>">
+        <p>No active jobs found.</p>
 
-    <form action="ClientProfileServlet" method="post" onsubmit="preparePhone()">
+    <% } else {
 
-        <label>Phone</label>
-        <input id="phone" name="phone" type="tel">
+        for (Job job : activeJobs) {
+    %>
 
-        <label>Company Name</label>
-        <input name="companyname"
-               value="<%= profile.getCompanyname() == null ? "" : profile.getCompanyname() %>">
+        <div class="job-card" style="position:relative;">
 
-        <label>Company Bio</label>
-        <textarea name="companybio" rows="3"><%= profile.getCompanybio() == null ? "" : profile.getCompanybio() %></textarea>
+            <h3>
+                <a href="JobInfoServlet?id=<%= job.getJobId() %>">
+                    <%= job.getTitle() %>
+                </a>
+            </h3>
 
-        <button type="submit">Save Profile</button>
-    </form>
+            <!-- DELETE BUTTON -->
+            <form action="DeleteJobServlet" method="post"
+                  style="position:absolute; top:20px; right:20px;"
+                  onsubmit="return confirm('Are you sure you want to delete this job?');">
 
-    <div class="completion">
-        Profile Completed: <%= completed %>%
-        <% if (!profileComplete) { %> – Please complete remaining details <% } %>
-    </div>
+                <input type="hidden" name="jobId" value="<%= job.getJobId() %>"/>
 
-    <a href="LogoutServlet" style="color:red;">Logout</a>
+                <button type="submit"
+                        style="background:#dc3545; color:white; border:none;
+                               padding:6px 12px; border-radius:5px; cursor:pointer;">
+                    Delete
+                </button>
+            </form>
+
+            <p><b>Budget:</b> ₹ <%= job.getBudget() %></p>
+            <p><b>Duration:</b> <%= job.getDuration() %></p>
+            <p><b>Level:</b> <%= job.getFreelancerLevel() %></p>
+
+            <p><b>Skills:</b><br/>
+
+                <%
+                    if (job.getSkills() != null) {
+                        for (JobSkill skill : job.getSkills()) {
+                %>
+                    <span class="skill-tag">
+                        <%= skill.getSkillName() %>
+                    </span>
+                <%
+                        }
+                    }
+                %>
+
+            </p>
+
+        </div>
+
+    <%  }
+       } %>
+
 </div>
 
 </body>

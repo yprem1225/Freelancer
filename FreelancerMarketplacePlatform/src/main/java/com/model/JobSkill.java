@@ -4,6 +4,7 @@ public class JobSkill {
 	private int id;
 	private int jobId;
 	private String skillName;
+	
 	public int getId() {
 		return id;
 	}
@@ -22,6 +23,7 @@ public class JobSkill {
 	public void setSkillName(String skillName) {
 		this.skillName = skillName;
 	}
+
 	
 	
 	

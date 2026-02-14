@@ -1,5 +1,7 @@
 package com.model;
 
+import java.util.List;
+
 public class Job {
 	private int jobId;
 	private int userId;
@@ -10,6 +12,7 @@ public class Job {
 	private String budget;
 	private String description;
 	private String status;
+	private List<JobSkill> skills;
 	public int getJobId() {
 		return jobId;
 	}
@@ -64,6 +67,13 @@ public class Job {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	public List<JobSkill> getSkills() {
+		return skills;
+	}
+	public void setSkills(List<JobSkill> skills) {
+		this.skills = skills;
+	}
+
 	
 	
 	
