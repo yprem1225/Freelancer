@@ -41,6 +41,12 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
         .post-job-btn {
             background: #28a745;
             color: #fff;
@@ -54,6 +60,16 @@
         .post-job-btn.disabled {
             background: #9ccc9c;
             cursor: not-allowed;
+        }
+
+        .wallet-btn {
+            background: #ffc107;
+            color: #000;
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 15px;
+            text-decoration: none;
+            font-weight: bold;
         }
 
         .profile-icon {
@@ -123,11 +139,18 @@
 
 <div class="header">
 
-    <% if (profileComplete) { %>
-        <a href="post_job_title.jsp" class="post-job-btn">+ Post Job</a>
-    <% } else { %>
-        <span class="post-job-btn disabled" onclick="blockPostJob()">+ Post Job</span>
-    <% } %>
+    <div class="nav-left">
+        <% if (profileComplete) { %>
+            <a href="post_job_title.jsp" class="post-job-btn">+ Post Job</a>
+        <% } else { %>
+            <span class="post-job-btn disabled" onclick="blockPostJob()">+ Post Job</span>
+        <% } %>
+
+        <!-- ✅ WALLET BUTTON ADDED -->
+        <a href="WalletServlet" class="wallet-btn">
+            💰 Wallet
+        </a>
+    </div>
 
     <a href="ClientProfileServlet" class="profile-icon">
         <%= profile.getName().substring(0,1).toUpperCase() %>

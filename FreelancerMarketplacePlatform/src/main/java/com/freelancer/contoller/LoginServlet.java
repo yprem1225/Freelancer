@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.freelancer.services.UserService;
+import com.freelancer.services.WalletService;
 import com.model.User;
 
 
@@ -63,6 +64,9 @@ public class LoginServlet extends HttpServlet {
 	            System.out.println("FORM ROLE = " + selectedRole);
 
 	            System.out.println("Registration successful, redirecting to home.jsp");
+	            
+	            WalletService walletService = new WalletService();
+	            walletService.createWalletIdNotExist(user.getId());
 	            
 	            response.sendRedirect("ClientHomeServlet");
 
