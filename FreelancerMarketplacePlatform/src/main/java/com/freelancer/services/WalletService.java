@@ -5,6 +5,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.model.Wallet;
 import com.util.DBConnection;
@@ -70,6 +74,65 @@ public class WalletService {
 
         ps.executeUpdate();
         con.close();
+    }
+    
+    public void saveTransaction(String transactionId,
+            int userId,
+            int walletId,
+            BigDecimal amount,
+            String type,
+            String status,
+            String description) throws ClassNotFoundException, SQLException {
+
+		Connection con = DBConnection.getConnection();
+		
+		String sql = "INSERT INTO transactions " +
+		"(transaction_id, user_id, wallet_id, amount, transaction_type, status, description) " +
+		"VALUES (?, ?, ?, ?, ?, ?, ?)";
+		
+		PreparedStatement ps = con.prepareStatement(sql);
+		
+		ps.setString(1, transactionId);
+		ps.setInt(2, userId);
+		ps.setInt(3, walletId);
+		ps.setBigDecimal(4, amount);
+		ps.setString(5, type);
+		ps.setString(6, status);
+		ps.setString(7, description);
+		
+		ps.executeUpdate();
+		con.close();
+		}
+    
+    
+    
+    public List<Map<String, Object>> getTransactionsByUser(int userId)
+            throws ClassNotFoundException, SQLException {
+
+        Connection con = DBConnection.getConnection();
+
+        String sql = "SELECT transaction_id, amount, transaction_type, status " +
+                     "FROM transactions WHERE user_id=? ORDER BY created_at DESC";
+
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setInt(1, userId);
+
+        ResultSet rs = ps.executeQuery();
+
+        List<Map<String, Object>> list = new ArrayList<>();
+
+        while (rs.next()) {
+            Map<String, Object> row = new HashMap<>();
+            row.put("transaction_id", rs.getString("transaction_id"));
+            row.put("amount", rs.getBigDecimal("amount"));
+            row.put("type", rs.getString("transaction_type"));
+            row.put("status", rs.getString("status"));
+
+            list.add(row);
+        }
+
+        con.close();
+        return list;
     }
 
 }

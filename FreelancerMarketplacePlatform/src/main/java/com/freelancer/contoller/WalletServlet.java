@@ -3,6 +3,8 @@ package com.freelancer.contoller;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -29,7 +31,15 @@ public class WalletServlet extends HttpServlet {
 		WalletService walletservice = new WalletService();
 		
 		try {
+			walletservice.createWalletIdNotExist(userId);
 			Wallet wallet = walletservice.getWalletByUser(userId);
+			
+			// 🔥 Add this
+			List<Map<String, Object>> transactions =
+			        walletservice.getTransactionsByUser(userId);
+
+			request.setAttribute("transactions", transactions);
+			
 			request.setAttribute("wallet", wallet);
             request.getRequestDispatcher("wallet.jsp")
                    .forward(request, response);
@@ -49,7 +59,31 @@ public class WalletServlet extends HttpServlet {
 	        
 	        WalletService walletService = new WalletService();
 	        try {
+	        	// Ensure wallet exists
+	            walletService.createWalletIdNotExist(userId);
+	            
+	         // Get wallet to fetch wallet_id
+	            Wallet wallet = walletService.getWalletByUser(userId);
+	            int walletId = wallet.getWalletId();
+	            
+	         // Generate fake transaction ID
+	            String transactionId = "TXN" + System.currentTimeMillis();
+	            
+	         // Save transaction
+	            walletService.saveTransaction(
+	                    transactionId,
+	                    userId,
+	                    walletId,
+	                    amount,
+	                    "CREDIT",
+	                    "SUCCESS",
+	                    "Dummy Wallet Top-up"
+	            );
+
+	            // Update wallet balance
 				walletService.addFunds(userId, amount);
+				
+				
 			} catch (ClassNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
