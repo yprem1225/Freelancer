@@ -54,7 +54,12 @@ public class SignupServlet extends HttpServlet {
 	        
 	        System.out.println("Registration successful, redirecting to home.jsp");
 	        
-	        response.sendRedirect("ClientProfileServlet");
+	        if(user.getRole().equals("client")){
+	            response.sendRedirect("ClientHomeServlet");
+	        }
+	        else if(user.getRole().equals("freelancer")){
+	            response.sendRedirect("FreelancerHomeServlet");
+	        }
 
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block

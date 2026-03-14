@@ -1,0 +1,54 @@
+package com.freelancer.contoller;
+
+import java.io.IOException;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
+import com.freelancer.services.FreelancerService;
+import com.model.FreelancerProfile;
+
+/**
+ * Servlet implementation class FreelancerHomeServlet
+ */
+@WebServlet("/FreelancerHomeServlet")
+public class FreelancerHomeServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		     HttpSession session = request.getSession(false);
+
+	        if(session == null || session.getAttribute("id") == null){
+	            response.sendRedirect("login.jsp");
+	            return;
+	        }
+	        
+	        int id = (int) session.getAttribute("id");
+
+	        FreelancerService service = new FreelancerService();
+
+	        try {
+
+	            FreelancerProfile profile = service.getProfile(id);
+
+	            // send profile to JSP
+	            request.setAttribute("profile", profile);
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+
+	        request.getRequestDispatcher("freelancer_home.jsp")
+	               .forward(request, response);
+	}
+
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

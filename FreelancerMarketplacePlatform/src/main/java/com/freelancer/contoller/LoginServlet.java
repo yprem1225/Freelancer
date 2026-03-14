@@ -68,7 +68,12 @@ public class LoginServlet extends HttpServlet {
 	            WalletService walletService = new WalletService();
 	            walletService.createWalletIdNotExist(user.getId());
 	            
-	            response.sendRedirect("ClientHomeServlet");
+	            if(user.getRole().equals("client")){
+	                response.sendRedirect("ClientHomeServlet");
+	            }
+	            else if(user.getRole().equals("freelancer")){
+	                response.sendRedirect("FreelancerHomeServlet");
+	            }
 
 
 		} catch (ClassNotFoundException | SQLException e) {
