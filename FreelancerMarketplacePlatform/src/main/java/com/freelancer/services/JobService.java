@@ -279,6 +279,51 @@ public class JobService {
          ps2.executeUpdate();
 	}
     
+    // fetch active jobs from all clients to freelancer
+    
+    @SuppressWarnings("unchecked")
+	public List<Job> getAllActiveJobs() throws SQLException {
+
+        List<Job> jobs = new ArrayList<>();
+
+        try {
+
+            Connection con = DBConnection.getConnection();
+
+            String sql = "SELECT * FROM jobs WHERE status='active'";
+
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            ResultSet rs = ps.executeQuery();
+
+            JobSkillService skillservice = new JobSkillService();
+
+            while (rs.next()) {
+
+                Job job = new Job();
+
+                job.setJobId(rs.getInt("job_id"));
+                job.setUserId(rs.getInt("user_id"));
+                job.setTitle(rs.getString("title"));
+                job.setComplexity(rs.getString("complexity"));
+                job.setDuration(rs.getString("duration"));
+                job.setFreelancerLevel(rs.getString("freelancer_level"));
+                job.setBudget(rs.getString("budget"));
+                job.setDescription(rs.getString("description"));
+                job.setStatus(rs.getString("status"));
+
+                job.setSkills(skillservice.getSkillsByJobId(job.getJobId()));
+
+                jobs.add(job);
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return jobs;
+    }
+    
     
     
     

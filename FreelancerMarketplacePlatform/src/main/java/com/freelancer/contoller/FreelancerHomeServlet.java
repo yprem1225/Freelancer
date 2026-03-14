@@ -1,6 +1,8 @@
 package com.freelancer.contoller;
 
 import java.io.IOException;
+import java.util.List;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -9,7 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.freelancer.services.FreelancerService;
+import com.freelancer.services.JobService;
 import com.model.FreelancerProfile;
+import com.model.Job;
 
 /**
  * Servlet implementation class FreelancerHomeServlet
@@ -29,13 +33,17 @@ public class FreelancerHomeServlet extends HttpServlet {
 	        int id = (int) session.getAttribute("id");
 
 	        FreelancerService service = new FreelancerService();
+	        JobService jobService = new JobService();
 
 	        try {
 
 	            FreelancerProfile profile = service.getProfile(id);
-
+	            
+	         // 👇 get all active jobs
+	            List<Job> activeJobs = jobService.getAllActiveJobs();
 	            // send profile to JSP
 	            request.setAttribute("profile", profile);
+	            request.setAttribute("activeJobs", activeJobs);
 
 	        } catch (Exception e) {
 	            e.printStackTrace();

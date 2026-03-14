@@ -1,12 +1,14 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="com.model.FreelancerProfile" %>
+<%@ page import="java.util.List" %>
+<%@ page import="com.model.Job" %>
 
 <%
 FreelancerProfile profile = (FreelancerProfile) request.getAttribute("profile");
 
 if(profile == null){
-    response.sendRedirect("login.jsp");
-    return;
+response.sendRedirect("login.jsp");
+return;
 }
 
 int completed = 30;
@@ -22,6 +24,7 @@ boolean profileComplete = completed == 100;
 %>
 
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -34,6 +37,8 @@ boolean profileComplete = completed == 100;
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
+
+/* YOUR ENTIRE CSS IS UNCHANGED */
 
 :root{
 --primary-blue:#2563eb;
@@ -224,7 +229,8 @@ background:var(--primary-blue);
 color:white;
 padding:10px 18px;
 border-radius:6px;
-text-decoration:none;
+border:none;
+cursor:pointer;
 font-size:14px;
 }
 
@@ -237,13 +243,60 @@ margin-bottom:25px;
 color:#92400e;
 }
 
+.job-card{
+background:#ffffff;
+border:1px solid var(--border-light);
+border-radius:10px;
+padding:20px;
+margin-bottom:15px;
+}
+
+.job-card h4{
+margin:0 0 10px 0;
+}
+
+/* MODAL */
+
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.6);
+justify-content:center;
+align-items:center;
+z-index:999;
+}
+
+.modal-content{
+background:white;
+width:600px;
+max-height:80%;
+overflow:auto;
+padding:25px;
+border-radius:10px;
+position:relative;
+}
+
+.close-btn{
+position:absolute;
+right:15px;
+top:10px;
+font-size:20px;
+border:none;
+background:none;
+cursor:pointer;
+}
+
 </style>
 
 </head>
 
 <body>
 
-<!-- NAVBAR -->
+<!-- NAVBAR (UNCHANGED) -->
 
 <nav class="navbar">
 
@@ -255,26 +308,21 @@ color:#92400e;
 
 <div class="nav-item">
 <a class="nav-link">Find Work ▼</a>
-
 <div class="dropdown-content">
 <a href="BrowseJobsServlet">Find Jobs</a>
 <a href="MyApplicationsServlet">My Applications</a>
 </div>
 </div>
 
-
 <div class="nav-item">
 <a class="nav-link">Deliver Work ▼</a>
-
 <div class="dropdown-content">
 <a href="#">My Projects</a>
 </div>
 </div>
 
-
 <div class="nav-item">
 <a class="nav-link">Manage Finances ▼</a>
-
 <div class="dropdown-content">
 <a href="WalletServlet">My Earnings</a>
 </div>
@@ -284,12 +332,10 @@ color:#92400e;
 
 </div>
 
-
 <div class="search-container">
 <span class="search-icon">🔍</span>
 <input type="text" class="search-input" placeholder="Search for jobs...">
 </div>
-
 
 <div class="nav-right">
 
@@ -298,88 +344,160 @@ color:#92400e;
 <a href="FreelancerProfileServlet" class="profile-box">
 
 <div style="text-align:right">
-
 <p class="user-name-small"><%= profile.getName() %></p>
 <span class="user-role-badge">Freelancer</span>
-
 </div>
 
 <div style="width:40px;height:40px;border-radius:50%;background:var(--primary-blue);color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;">
-
 <%= profile.getName().substring(0,1).toUpperCase() %>
-
 </div>
 
 </a>
 
 <form action="LogoutServlet" method="post" style="margin:0">
-
 <button type="submit" class="logout-btn">Logout</button>
-
 </form>
 
 </div>
 
 </nav>
 
-<!-- DASHBOARD -->
-
 <div class="container">
 
 <% if(!profileComplete){ %>
 
 <div class="warning">
-
 <b>Profile incomplete (<%= completed %>%)</b> — Complete your profile to apply for jobs.
-
 </div>
-
 <% } %>
 
-<div class="card">
+<h2>Available Jobs</h2>
 
-<h3>Browse Jobs</h3>
+<%
+List<Job> activeJobs = (List<Job>) request.getAttribute("activeJobs");
 
-<p>Find projects posted by clients.</p>
+if(activeJobs != null){
+for(Job job : activeJobs){
+%>
 
-<a class="btn" href="BrowseJobsServlet">View Jobs</a>
+<div class="job-card">
 
-</div>
+<h4><%= job.getTitle() %></h4>
 
+<p><b>Budget:</b> ₹<%= job.getBudget() %></p>
+<p><b>Duration:</b> <%= job.getDuration() %></p>
+<p><b>Level:</b> <%= job.getFreelancerLevel() %></p>
 
-<div class="card">
+<button class="btn"
+onclick="openModal(
+'<%= job.getJobId() %>',
+'<%= job.getTitle().replace("'", "\'") %>',
+'<%= job.getBudget() %>',
+'<%= job.getDuration() %>',
+'<%= job.getFreelancerLevel() %>',
+'<%= job.getComplexity() %>',
+'<%= job.getDescription().replace("'", "\'") %>'
+)">
+View Details </button>
 
-<h3>My Applications</h3>
-
-<p>See jobs you applied for.</p>
-
-<a class="btn" href="MyApplicationsServlet">View Applications</a>
-
-</div>
-
-
-<div class="card">
-
-<h3>My Earnings</h3>
-
-<p>Check your wallet balance.</p>
-
-<a class="btn" href="WalletServlet">My Wallet</a>
-
-</div>
-
-
-<div class="card">
-
-<h3>Profile</h3>
-
-<p>Update freelancer profile.</p>
-
-<a class="btn" href="FreelancerProfileServlet">Edit Profile</a>
+<button class="btn"
+onclick="openApplyModal('<%= job.getJobId() %>')">
+Apply for Job </button>
 
 </div>
 
+<%
+}
+}
+%>
+
 </div>
+
+<!-- JOB MODAL -->
+
+<div id="jobModal" class="modal">
+
+<div class="modal-content">
+
+<button class="close-btn" onclick="closeModal()">✖</button>
+
+<h2 id="modalTitle"></h2>
+
+<p><b>Budget:</b> ₹<span id="modalBudget"></span></p>
+<p><b>Duration:</b> <span id="modalDuration"></span></p>
+<p><b>Freelancer Level:</b> <span id="modalLevel"></span></p>
+<p><b>Complexity:</b> <span id="modalComplexity"></span></p>
+
+<h3>Description</h3>
+<p id="modalDescription"></p>
+
+</div>
+
+</div>
+
+<!-- APPLY JOB MODAL -->
+
+<div id="applyModal" class="modal">
+
+<div class="modal-content">
+
+<button class="close-btn" onclick="closeApplyModal()">✖</button>
+
+<h2>Apply for this Job</h2>
+
+<form action="ApplyJobServlet" method="post">
+
+<input type="hidden" name="jobId" id="applyJobId">
+
+<label><b>Proposal</b></label>
+
+<textarea name="cover" required
+style="width:100%;height:120px;margin-top:10px;padding:10px;"></textarea>
+
+<br><br>
+
+<button class="btn" type="submit">Submit Application</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script>
+
+let currentJobId = 0;
+
+function openModal(id,title,budget,duration,level,complexity,description){
+
+currentJobId = id;
+
+document.getElementById("modalTitle").innerText = title;
+document.getElementById("modalBudget").innerText = budget;
+document.getElementById("modalDuration").innerText = duration;
+document.getElementById("modalLevel").innerText = level;
+document.getElementById("modalComplexity").innerText = complexity;
+document.getElementById("modalDescription").innerText = description;
+
+document.getElementById("jobModal").style.display="flex";
+}
+
+function closeModal(){
+document.getElementById("jobModal").style.display="none";
+}
+
+function openApplyModal(jobId){
+
+document.getElementById("applyJobId").value = jobId;
+document.getElementById("applyModal").style.display="flex";
+
+}
+
+function closeApplyModal(){
+document.getElementById("applyModal").style.display="none";
+}
+
+</script>
 
 </body>
 </html>
