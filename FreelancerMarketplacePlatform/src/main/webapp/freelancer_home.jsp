@@ -310,7 +310,7 @@ cursor:pointer;
 <a class="nav-link">Find Work ▼</a>
 <div class="dropdown-content">
 <a href="BrowseJobsServlet">Find Jobs</a>
-<a href="MyApplicationsServlet">My Applications</a>
+<a href="AppliedJobServlet">My Applications</a>
 </div>
 </div>
 

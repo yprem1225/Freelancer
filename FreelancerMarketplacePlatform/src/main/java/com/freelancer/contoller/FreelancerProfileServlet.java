@@ -37,6 +37,8 @@ public class FreelancerProfileServlet extends HttpServlet {
 		return;
 		}
 		
+		
+		
 		int id=(int)session.getAttribute("id");
 
 		FreelancerService service=new FreelancerService();
@@ -60,13 +62,29 @@ public class FreelancerProfileServlet extends HttpServlet {
 		int id=(int)session.getAttribute("id");
 
 		FreelancerProfile p=new FreelancerProfile();
+		
+		String exp = request.getParameter("experience");
+		String rate = request.getParameter("rate");
+
+		
 
 		p.setId(id);
 		p.setPhone(request.getParameter("phone"));
 		p.setTitle(request.getParameter("title"));
 		p.setSkills(request.getParameter("skills"));
-		p.setExperienceYears(Integer.parseInt(request.getParameter("experience")));
-		p.setHourlyRate(Double.parseDouble(request.getParameter("rate")));
+		
+		if(exp != null && !exp.trim().isEmpty()){
+		    p.setExperienceYears(Integer.parseInt(exp));
+		}else{
+		    p.setExperienceYears(0);
+		}
+
+		if(rate != null && !rate.trim().isEmpty()){
+		    p.setHourlyRate(Double.parseDouble(rate));
+		}else{
+		    p.setHourlyRate(0);
+		}
+		
 		p.setBio(request.getParameter("bio"));
 
 		FreelancerService service=new FreelancerService();

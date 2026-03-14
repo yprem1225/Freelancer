@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.model.AppliedJob;
 import com.model.Job;
 import com.util.DBConnection;
 
@@ -324,6 +325,47 @@ public class JobService {
         return jobs;
     }
     
+    
+    // display appiled jobs by the client
+    public List<AppliedJob> getAppliedJobs(int freelancerId) {
+
+        List<AppliedJob> list = new ArrayList<>();
+
+        try {
+
+            Connection con = DBConnection.getConnection();
+
+            String sql = "SELECT j.job_id, j.title, j.description, j.budget, ja.status, ja.proposal "
+                    + "FROM job_applications ja "
+                    + "JOIN jobs j ON ja.job_id = j.job_id "
+                    + "WHERE ja.freelancer_id=?";
+
+            PreparedStatement ps = con.prepareStatement(sql);
+
+            ps.setInt(1, freelancerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                AppliedJob job = new AppliedJob();
+
+                job.setJobId(rs.getInt("job_id"));
+                job.setTitle(rs.getString("title"));
+                job.setDescription(rs.getString("description"));
+                job.setBudget(rs.getDouble("budget"));
+                job.setStatus(rs.getString("status"));
+                job.setProposal(rs.getString("proposal"));
+
+                list.add(job);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
     
     
     
