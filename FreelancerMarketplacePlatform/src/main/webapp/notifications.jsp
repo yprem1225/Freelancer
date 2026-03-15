@@ -32,13 +32,8 @@ View Freelancer Profile
 <input type="hidden" name="jobId" value="<%= n.getJobId() %>">
 <input type="hidden" name="notificationId" value="<%= n.getNotificationId() %>">
 
-<button type="submit" name="status" value="accepted">
-Accept
-</button>
-
-<button type="submit" name="status" value="rejected">
-Reject
-</button>
+<button type="submit" name="status" value="accepted">Accept</button>
+<button type="submit" name="status" value="rejected">Reject</button>
 
 </form>
 

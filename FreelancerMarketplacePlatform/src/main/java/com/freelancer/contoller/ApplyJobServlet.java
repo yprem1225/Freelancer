@@ -24,7 +24,7 @@ public class ApplyJobServlet extends HttpServlet {
 
 		response.setContentType("text/html");
 
-        try {
+		try {
 
             HttpSession session = request.getSession(false);
 
@@ -49,11 +49,12 @@ public class ApplyJobServlet extends HttpServlet {
 
             /*
              * 1️⃣ Insert Job Application
+             * Now we capture the generated application_id
              */
 
             String sql = "INSERT INTO job_applications(job_id,freelancer_id,proposal,status) VALUES(?,?,?,?)";
 
-            PreparedStatement ps = con.prepareStatement(sql);
+            PreparedStatement ps = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
 
             ps.setInt(1, jobId);
             ps.setInt(2, freelancerId);
@@ -62,10 +63,23 @@ public class ApplyJobServlet extends HttpServlet {
 
             ps.executeUpdate();
 
+            /*
+             * Get the generated application_id
+             */
+
+            ResultSet generatedKeys = ps.getGeneratedKeys();
+
+            int applicationId = 0;
+
+            if (generatedKeys.next()) {
+                applicationId = generatedKeys.getInt(1);
+            }
+
+            generatedKeys.close();
             ps.close();
 
             /*
-             * 2️⃣ Get Client ID who posted this job
+             * 2️⃣ Get Client ID who posted the job
              */
 
             String getClientSql = "SELECT user_id FROM jobs WHERE job_id=?";
@@ -87,6 +101,7 @@ public class ApplyJobServlet extends HttpServlet {
 
             /*
              * 3️⃣ Insert Notification for Client
+             * reference_id now stores application_id
              */
 
             String notifySql = "INSERT INTO notifications(user_id,user_type,message,reference_id) VALUES(?,?,?,?)";
@@ -96,7 +111,7 @@ public class ApplyJobServlet extends HttpServlet {
             notifyPs.setInt(1, clientId);
             notifyPs.setString(2, "client");
             notifyPs.setString(3, "A freelancer has applied to your job");
-            notifyPs.setInt(4, jobId);
+            notifyPs.setInt(4, applicationId);
 
             notifyPs.executeUpdate();
 

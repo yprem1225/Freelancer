@@ -113,7 +113,7 @@ for(Notification n : list){
 %>
 
 <div class="back">
-<a href="freelancer_home.jsp">Back to Dashboard</a>
+<a href="FreelancerHomeServlet">Back to Dashboard</a>
 </div>
 
 </div>

@@ -29,7 +29,9 @@ public class FreelancerHomeServlet extends HttpServlet {
 	            response.sendRedirect("login.jsp");
 	            return;
 	        }
-	        
+	        System.out.println("Inside FreelancerHomeServlet");
+	        System.out.println("Role = " + session.getAttribute("role"));
+	        System.out.println("ID = " + session.getAttribute("id"));
 	        int id = (int) session.getAttribute("id");
 
 	        FreelancerService service = new FreelancerService();

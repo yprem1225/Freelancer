@@ -21,84 +21,102 @@ public class UpdateApplicationStatusServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try {
+		 try {
 
-            int applicationId = Integer.parseInt(request.getParameter("appId"));
-            int jobId = Integer.parseInt(request.getParameter("jobId"));
-            int notificationId = Integer.parseInt(request.getParameter("notificationId"));
-            String status = request.getParameter("status");
+	            int applicationId = Integer.parseInt(request.getParameter("appId"));
+	            int jobId = Integer.parseInt(request.getParameter("jobId"));
+	            int notificationId = Integer.parseInt(request.getParameter("notificationId"));
+	            String status = request.getParameter("status");
 
-            Connection con = DBConnection.getConnection();
+	            Connection con = DBConnection.getConnection();
 
-            // find freelancer id
-            String getFreelancer = "SELECT freelancer_id FROM job_applications WHERE application_id=?";
-            PreparedStatement ps1 = con.prepareStatement(getFreelancer);
-            ps1.setInt(1, applicationId);
+	            // 1️⃣ Get freelancer ID
+	            String getFreelancer = "SELECT freelancer_id FROM job_applications WHERE application_id=?";
+	            PreparedStatement ps1 = con.prepareStatement(getFreelancer);
 
-            ResultSet rs = ps1.executeQuery();
+	            ps1.setInt(1, applicationId);
 
-            int freelancerId = 0;
+	            ResultSet rs = ps1.executeQuery();
 
-            if(rs.next()){
-                freelancerId = rs.getInt("freelancer_id");
-            }
+	            int freelancerId = 0;
 
-            if(status.equals("accepted")){
+	            if (rs.next()) {
+	                freelancerId = rs.getInt("freelancer_id");
+	            }
 
-                // update application
-                String updateApp = "UPDATE job_applications SET status='accepted' WHERE application_id=?";
-                PreparedStatement ps2 = con.prepareStatement(updateApp);
-                ps2.setInt(1, applicationId);
-                ps2.executeUpdate();
+	            rs.close();
+	            ps1.close();
 
-                // update job status
-                String updateJob = "UPDATE jobs SET status='WORKING' WHERE job_id=?";
-                PreparedStatement ps3 = con.prepareStatement(updateJob);
-                ps3.setInt(1, jobId);
-                ps3.executeUpdate();
+	            if (status.equals("accepted")) {
 
-                // notification to freelancer
-                String notify = "INSERT INTO notifications(user_id,user_type,message,reference_id) VALUES(?,?,?,?)";
-                PreparedStatement ps4 = con.prepareStatement(notify);
+	                // update application status
+	                String updateApp = "UPDATE job_applications SET status='accepted' WHERE application_id=?";
+	                PreparedStatement ps2 = con.prepareStatement(updateApp);
 
-                ps4.setInt(1, freelancerId);
-                ps4.setString(2, "freelancer");
-                ps4.setString(3, "🎉 Your proposal was accepted by the client.");
-                ps4.setInt(4, applicationId);
+	                ps2.setInt(1, applicationId);
+	                ps2.executeUpdate();
+	                ps2.close();
 
-                ps4.executeUpdate();
+	                // update job status
+	                String updateJob = "UPDATE jobs SET status='WORKING' WHERE job_id=?";
+	                PreparedStatement ps3 = con.prepareStatement(updateJob);
 
-            } else {
+	                ps3.setInt(1, jobId);
+	                ps3.executeUpdate();
+	                ps3.close();
 
-                // delete proposal
-                String deleteApp = "DELETE FROM job_applications WHERE application_id=?";
-                PreparedStatement ps5 = con.prepareStatement(deleteApp);
-                ps5.setInt(1, applicationId);
-                ps5.executeUpdate();
+	                // send notification
+	                String notify = "INSERT INTO notifications(user_id,user_type,message,reference_id) VALUES(?,?,?,?)";
 
-                // notify freelancer
-                String notify = "INSERT INTO notifications(user_id,user_type,message,reference_id) VALUES(?,?,?,?)";
-                PreparedStatement ps6 = con.prepareStatement(notify);
+	                PreparedStatement ps4 = con.prepareStatement(notify);
 
-                ps6.setInt(1, freelancerId);
-                ps6.setString(2, "freelancer");
-                ps6.setString(3, "❌ Your proposal was rejected by the client.");
-                ps6.setInt(4, applicationId);
+	                ps4.setInt(1, freelancerId);
+	                ps4.setString(2, "freelancer");
+	                ps4.setString(3, "🎉 Your proposal was accepted by the client.");
+	                ps4.setInt(4, applicationId);
 
-                ps6.executeUpdate();
-            }
+	                ps4.executeUpdate();
+	                ps4.close();
 
-            // delete client notification
-            String deleteNotification = "DELETE FROM notifications WHERE notification_id=?";
-            PreparedStatement ps7 = con.prepareStatement(deleteNotification);
+	            } else {
 
-            ps7.setInt(1, notificationId);
-            ps7.executeUpdate();
+	                // change status instead of deleting
+	                String rejectApp = "UPDATE job_applications SET status='rejected' WHERE application_id=?";
+	                PreparedStatement ps5 = con.prepareStatement(rejectApp);
 
-            response.sendRedirect("NotificationServlet");
+	                ps5.setInt(1, applicationId);
+	                ps5.executeUpdate();
+	                ps5.close();
 
-        } catch(Exception e){
-            e.printStackTrace();
+	                // rejection notification
+	                String notify = "INSERT INTO notifications(user_id,user_type,message,reference_id) VALUES(?,?,?,?)";
+
+	                PreparedStatement ps6 = con.prepareStatement(notify);
+
+	                ps6.setInt(1, freelancerId);
+	                ps6.setString(2, "freelancer");
+	                ps6.setString(3, "❌ Your proposal was rejected by the client.");
+	                ps6.setInt(4, applicationId);
+
+	                ps6.executeUpdate();
+	                ps6.close();
+	            }
+
+	            // delete client notification
+	            String deleteNotification = "DELETE FROM notifications WHERE notification_id=?";
+	            PreparedStatement ps7 = con.prepareStatement(deleteNotification);
+
+	            ps7.setInt(1, notificationId);
+	            ps7.executeUpdate();
+	            ps7.close();
+
+	            con.close();
+
+	            response.sendRedirect("NotificationServlet");
+
+	        }
+	        catch (Exception e) {
+	            e.printStackTrace();
         }
 	}
 

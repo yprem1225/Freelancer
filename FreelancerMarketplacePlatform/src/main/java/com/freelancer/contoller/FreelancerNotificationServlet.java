@@ -30,11 +30,24 @@ public class FreelancerNotificationServlet extends HttpServlet {
 		try {
 
             HttpSession session = request.getSession(false);
+            System.out.println("----- SESSION DEBUG START -----");
 
-            if (session == null || session.getAttribute("id") == null) {
-                response.sendRedirect("login.jsp");
-                return;
+            if(session == null){
+                System.out.println("Session is NULL");
+            }else{
+
+                System.out.println("Session ID: " + session.getId());
+
+                java.util.Enumeration<String> attributes = session.getAttributeNames();
+
+                while(attributes.hasMoreElements()){
+                    String name = attributes.nextElement();
+                    Object value = session.getAttribute(name);
+
+                    System.out.println("Session Attribute -> " + name + " : " + value);
+                }
             }
+
 
             int freelancerId = Integer.parseInt(session.getAttribute("id").toString());
 
@@ -42,12 +55,11 @@ public class FreelancerNotificationServlet extends HttpServlet {
 
             String sql =
             		"SELECT n.notification_id, n.message, n.created_at, j.title, ja.proposal " +
-            				"FROM notifications n " +
-            				"LEFT JOIN jobs j ON n.reference_id = j.job_id " +
-            				"LEFT JOIN job_applications ja ON ja.job_id = j.job_id " +
-            				"WHERE n.user_id=? AND n.user_type='freelancer' " +
-            				"ORDER BY n.created_at DESC";
-            
+            		"FROM notifications n " +
+            		"JOIN job_applications ja ON n.reference_id = ja.application_id " +
+            		"JOIN jobs j ON ja.job_id = j.job_id " +
+            		"WHERE n.user_id=? AND n.user_type='freelancer' " +
+            		"ORDER BY n.created_at DESC";
             PreparedStatement ps = con.prepareStatement(sql);
             ps.setInt(1, freelancerId);
 
