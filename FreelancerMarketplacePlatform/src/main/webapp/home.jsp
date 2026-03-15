@@ -438,6 +438,7 @@
             </div>
             <a href="#" class="nav-link">Messages</a>
         </div>
+        <a href="NotificationServlet" class="nav-link">🔔 Notifications</a>
 
         <div class="search-container">
             <span class="search-icon">🔍</span>
