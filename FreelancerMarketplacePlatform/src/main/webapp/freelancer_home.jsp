@@ -336,12 +336,13 @@ cursor:pointer;
 <span class="search-icon">🔍</span>
 <input type="text" class="search-input" placeholder="Search for jobs...">
 </div>
+<a href="FreelancerNotificationServlet">Notifications</a>
 
 <div class="nav-right">
 
 <a href="WalletServlet" class="nav-link">💰 Wallet</a>
 
-<a href="FreelancerProfileServlet" class="profile-box">
+<a href="freelancer_dashboard.jsp" class="profile-box">
 
 <div style="text-align:right">
 <p class="user-name-small"><%= profile.getName() %></p>

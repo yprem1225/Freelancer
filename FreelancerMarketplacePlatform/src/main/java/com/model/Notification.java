@@ -16,6 +16,9 @@ public class Notification {
     private String proposal;
     private int freelancerId;
     private int jobId;
+    
+    private int applicationId;
+    
 	public String getFreelancerName() {
 		return freelancerName;
 	}
@@ -93,6 +96,12 @@ public class Notification {
 	}
 	public void setCreatedAt(String createdAt) {
 		this.createdAt = createdAt;
+	}
+	public int getApplicationId() {
+		return applicationId;
+	}
+	public void setApplicationId(int applicationId) {
+		this.applicationId = applicationId;
 	}
 
 }

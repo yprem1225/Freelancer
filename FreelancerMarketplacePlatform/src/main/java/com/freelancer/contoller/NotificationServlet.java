@@ -26,75 +26,78 @@ public class NotificationServlet extends HttpServlet {
        
     
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		try{
+		 try{
 
-            HttpSession session = request.getSession(false);
+	            HttpSession session = request.getSession(false);
+	            int userId = Integer.parseInt(session.getAttribute("id").toString());
 
-            int userId = Integer.parseInt(session.getAttribute("id").toString());
-            
+	            Connection con = DBConnection.getConnection();
 
-            Connection con = DBConnection.getConnection();
+	            String sql =
+	            		"SELECT " +
+	            		"n.notification_id, " +
+	            		"n.reference_id, " +
+	            		"n.message, " +
+	            		"n.created_at, " +
+	            		"ja.application_id,"+
+	            		"ja.proposal, " +
+	            		"ja.freelancer_id, " +
+	            		"u.name AS freelancer_name, " +
+	            		"fp.title AS freelancer_title, " +
+	            		"j.title AS job_title, " +
+	            		"j.job_id " +
 
-            String sql = "SELECT \r\n"
-            		+ "n.notification_id,\r\n"
-            		+ "n.message,\r\n"
-            		+ "n.created_at,\r\n"
-            		+ "ja.proposal,\r\n"
-            		+ "u.name AS freelancer_name,\r\n"
-            		+ "fp.title AS freelancer_title,\r\n"
-            		+ "j.title AS job_title,\r\n"
-            		+ "ja.freelancer_id,\r\n"
-            		+ "j.job_id\r\n"
-            		+ "\r\n"
-            		+ "FROM notifications n\r\n"
-            		+ "\r\n"
-            		+ "JOIN job_applications ja ON n.reference_id = ja.job_id\r\n"
-            		+ "JOIN users u ON ja.freelancer_id = u.id\r\n"
-            		+ "LEFT JOIN freelancer_profile fp ON fp.user_id = u.id\r\n"
-            		+ "JOIN jobs j ON j.job_id = ja.job_id\r\n"
-            		+ "\r\n"
-            		+ "WHERE n.user_id=?\r\n"
-            		+ "\r\n"
-            		+ "ORDER BY n.created_at DESC";
+	            		"FROM notifications n " +
 
-            PreparedStatement ps = con.prepareStatement(sql);
+	            		"JOIN job_applications ja ON n.reference_id = ja.job_id " +   // FIXED
+	            		"JOIN users u ON ja.freelancer_id = u.id " +
+	            		"LEFT JOIN freelancer_profile fp ON fp.user_id = u.id " +
+	            		"JOIN jobs j ON j.job_id = ja.job_id " +
 
-            ps.setInt(1, userId);
-            
+	            		"WHERE n.user_id=? " +
+	            		"ORDER BY n.created_at DESC";
+	            PreparedStatement ps = con.prepareStatement(sql);
+	            ps.setInt(1, userId);
 
-            ResultSet rs = ps.executeQuery();
+	            ResultSet rs = ps.executeQuery();
 
-            List<Notification> list = new ArrayList<>();
+	            List<Notification> list = new ArrayList<>();
 
-            while(rs.next()){
+	            while(rs.next()){
 
-            	Notification n = new Notification();
+	                Notification n = new Notification();
 
-            	n.setMessage(rs.getString("message"));
-            	n.setCreatedAt(rs.getString("created_at"));
+	                n.setNotificationId(rs.getInt("notification_id"));
+	                n.setReferenceId(rs.getInt("reference_id"));
 
-            	n.setFreelancerName(rs.getString("freelancer_name"));
-            	n.setFreelancerTitle(rs.getString("freelancer_title"));
-            	n.setJobTitle(rs.getString("job_title"));
-            	n.setProposal(rs.getString("proposal"));
+	                n.setMessage(rs.getString("message"));
+	                n.setCreatedAt(rs.getString("created_at"));
 
-            	n.setFreelancerId(rs.getInt("freelancer_id"));
-            	n.setJobId(rs.getInt("job_id"));
+	                n.setFreelancerName(rs.getString("freelancer_name"));
+	                n.setFreelancerTitle(rs.getString("freelancer_title"));
+	                n.setJobTitle(rs.getString("job_title"));
+	                n.setProposal(rs.getString("proposal"));
 
-            	list.add(n);
-            }
+	                n.setFreelancerId(rs.getInt("freelancer_id"));
+	                n.setJobId(rs.getInt("job_id"));
+	                n.setApplicationId(rs.getInt("application_id"));
 
-            request.setAttribute("notifications", list);
+	                list.add(n);
+	            }
 
-            request.getRequestDispatcher("notifications.jsp").forward(request,response);
+	            request.setAttribute("notifications", list);
 
-            con.close();
+	            request.getRequestDispatcher("notifications.jsp").forward(request,response);
 
-        }catch(Exception e){
-            e.printStackTrace();
-            response.getWriter().println(e);
-        }
+	            con.close();
+
+	        }catch(Exception e){
+	            e.printStackTrace();
+	            response.getWriter().println(e);
+	        }
 	}
+	
+	
 
 
 }

@@ -24,11 +24,23 @@ for(Notification n : list){
 View Freelancer Profile
 </a>
 
-&nbsp;&nbsp;
+<br><br>
 
-<a href="ClientJobApplicationsServlet?jobId=<%=n.getJobId()%>">
-View Application
-</a>
+<form action="UpdateApplicationStatusServlet" method="post">
+
+<input type="hidden" name="appId" value="<%= n.getApplicationId() %>">
+<input type="hidden" name="jobId" value="<%= n.getJobId() %>">
+<input type="hidden" name="notificationId" value="<%= n.getNotificationId() %>">
+
+<button type="submit" name="status" value="accepted">
+Accept
+</button>
+
+<button type="submit" name="status" value="rejected">
+Reject
+</button>
+
+</form>
 
 </div>
 
