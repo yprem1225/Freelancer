@@ -343,7 +343,7 @@ cursor:pointer;
 
 <a href="WalletServlet" class="nav-link">💰 Wallet</a>
 
-<a href="freelancer_dashboard.jsp" class="profile-box">
+<a href="FreelancerProfileServlet" class="profile-box">
 
 <div style="text-align:right">
 <p class="user-name-small"><%= profile.getName() %></p>

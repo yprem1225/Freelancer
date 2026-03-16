@@ -49,7 +49,7 @@ public class FreelancerProfileServlet extends HttpServlet {
 
 		request.setAttribute("profile",profile);
 
-		request.getRequestDispatcher("freelancer_profile.jsp")
+		request.getRequestDispatcher("freelancer_dashboard.jsp")
 		.forward(request,response);
 
 		}catch(Exception e){ e.printStackTrace(); }
