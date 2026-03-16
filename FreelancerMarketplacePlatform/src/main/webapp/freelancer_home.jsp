@@ -337,6 +337,7 @@ cursor:pointer;
 <input type="text" class="search-input" placeholder="Search for jobs...">
 </div>
 <a href="FreelancerNotificationServlet">Notifications</a>
+<a href="ChatServlet" class="nav-link">Messages</a>
 
 <div class="nav-right">
 
@@ -388,6 +389,14 @@ for(Job job : activeJobs){
 <p><b>Budget:</b> ₹<%= job.getBudget() %></p>
 <p><b>Duration:</b> <%= job.getDuration() %></p>
 <p><b>Level:</b> <%= job.getFreelancerLevel() %></p>
+
+<a class="btn"
+href="ChatServlet?jobId=<%=job.getJobId()%>">
+
+Open Project Chat
+
+</a>
+
 
 <button class="btn"
 onclick="openModal(

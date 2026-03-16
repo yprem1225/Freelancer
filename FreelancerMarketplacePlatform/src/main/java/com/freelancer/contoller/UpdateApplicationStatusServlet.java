@@ -10,6 +10,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.util.DBConnection;
 
@@ -48,6 +49,10 @@ public class UpdateApplicationStatusServlet extends HttpServlet {
 	            ps1.close();
 
 	            if (status.equals("accepted")) {
+	            	
+
+	                HttpSession session = request.getSession();
+	            	int clientId = Integer.parseInt(session.getAttribute("id").toString());
 
 	                // update application status
 	                String updateApp = "UPDATE job_applications SET status='accepted' WHERE application_id=?";
@@ -64,7 +69,19 @@ public class UpdateApplicationStatusServlet extends HttpServlet {
 	                ps3.setInt(1, jobId);
 	                ps3.executeUpdate();
 	                ps3.close();
+	                
+	             // create chat room
+	                String chatSql =
+	                "INSERT INTO chat_rooms(job_id,client_id,freelancer_id) VALUES(?,?,?)";
 
+	                PreparedStatement psChat = con.prepareStatement(chatSql);
+
+	                psChat.setInt(1, jobId);
+	                psChat.setInt(2, clientId);
+	                psChat.setInt(3, freelancerId);
+
+	                psChat.executeUpdate();
+	                psChat.close();
 	                // send notification
 	                String notify = "INSERT INTO notifications(user_id,user_type,message,reference_id) VALUES(?,?,?,?)";
 

@@ -440,6 +440,7 @@
         </div>
         <a href="NotificationServlet" class="nav-link">🔔 Notifications</a>
 
+
         <div class="search-container">
             <span class="search-icon">🔍</span>
             <input type="text" class="search-input" placeholder="Search for talent or projects...">
@@ -504,6 +505,7 @@
             %>
                 <div class="job-card">
                     <h3><a href="JobInfoServlet?id=<%= job.getJobId() %>"><%= job.getTitle() %></a></h3>
+                    <a href="ChatServlet?jobId=<%=job.getJobId()%>">Open Chat</a>
                     <form action="DeleteJobServlet" method="post" onsubmit="return confirm('Permanently remove this project?');">
                         <input type="hidden" name="jobId" value="<%= job.getJobId() %>"/>
                         <button type="submit" class="delete-btn">Remove</button>
