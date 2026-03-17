@@ -40,8 +40,11 @@ public class ClientHomeServlet extends HttpServlet {
 	        try {
 	            ClientProfile profile = service.getProfile(id);
 	            List<Job> activejobs = jobService.getActiveJobsByUser(id);
+	            List<Job> workingJobs = jobService.getWorkingJobsByUser(id);
+	            
 	            request.setAttribute("profile", profile);
 	            request.setAttribute("activeJobs", activejobs);
+	            request.setAttribute("workingJobs", workingJobs);
 	            request.getRequestDispatcher("home.jsp")
 	                    .forward(request, response);
 

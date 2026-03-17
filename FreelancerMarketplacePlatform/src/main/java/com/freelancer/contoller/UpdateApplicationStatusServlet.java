@@ -62,11 +62,13 @@ public class UpdateApplicationStatusServlet extends HttpServlet {
 	                ps2.executeUpdate();
 	                ps2.close();
 
-	                // update job status
-	                String updateJob = "UPDATE jobs SET status='WORKING' WHERE job_id=?";
+	             // update job status + assign freelancer
+	                String updateJob = "UPDATE jobs SET status='WORKING', assigned_freelancer_id=? WHERE job_id=?";
 	                PreparedStatement ps3 = con.prepareStatement(updateJob);
 
-	                ps3.setInt(1, jobId);
+	                ps3.setInt(1, freelancerId);  // ✅ assign freelancer
+	                ps3.setInt(2, jobId);
+
 	                ps3.executeUpdate();
 	                ps3.close();
 	                

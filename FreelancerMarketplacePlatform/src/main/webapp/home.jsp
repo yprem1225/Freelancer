@@ -515,8 +515,48 @@
                         <span><strong>Duration:</strong> <%= job.getDuration() %></span>
                     </div>
                 </div>
-            <% } } %>
+            <% 
+            } // END ACTIVE LOOP
+        } 
+        %>
         </div>
+        
+        <hr style="margin:50px 0;">
+
+    <h2 style="margin-bottom:25px; font-size:1.5rem;">Your Ongoing Projects</h2>
+
+    <div class="jobs-list">
+        <%
+            List<Job> workingJobs = (List<Job>) request.getAttribute("workingJobs");
+
+            if (workingJobs == null || workingJobs.isEmpty()) {
+        %>
+            <div style="text-align:center; padding:60px;">
+                <p>No ongoing projects found.</p>
+            </div>
+        <% } else {
+            for (Job job : workingJobs) {
+        %>
+
+        <!-- WORKING JOB CARD -->
+        <div class="job-card" style="border-left:5px solid #22c55e;">
+            <h3><a href="JobInfoServlet?id=<%= job.getJobId() %>"><%= job.getTitle() %></a></h3>
+
+            <a href="ChatServlet?jobId=<%=job.getJobId()%>">Open Chat</a>
+
+            <div style="display:flex; gap:30px; margin-top:15px;">
+                <span><strong>Budget:</strong> ₹<%= job.getBudget() %></span>
+                <span><strong>Duration:</strong> <%= job.getDuration() %></span>
+                <span style="color:#22c55e;">● In Progress</span>
+            </div>
+        </div>
+
+        <% 
+            }
+        } 
+        %>
+    </div>
+        
 
         <hr style="border:0; border-top:1px solid var(--border-light); margin:50px 0;">
 

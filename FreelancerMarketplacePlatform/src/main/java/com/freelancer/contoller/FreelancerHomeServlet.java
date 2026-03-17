@@ -43,9 +43,11 @@ public class FreelancerHomeServlet extends HttpServlet {
 	            
 	         // 👇 get all active jobs
 	            List<Job> activeJobs = jobService.getAllActiveJobs();
+	            List<Job> workingJobs = jobService.getJobsByFreelancer(id);
 	            // send profile to JSP
 	            request.setAttribute("profile", profile);
 	            request.setAttribute("activeJobs", activeJobs);
+	            request.setAttribute("workingJobs", workingJobs);
 
 	        } catch (Exception e) {
 	            e.printStackTrace();

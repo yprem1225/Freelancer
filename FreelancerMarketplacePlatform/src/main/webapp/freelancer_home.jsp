@@ -372,6 +372,57 @@ cursor:pointer;
 <b>Profile incomplete (<%= completed %>%)</b> — Complete your profile to apply for jobs.
 </div>
 <% } %>
+<h2>My Working Projects</h2>
+
+<%
+List<Job> workingJobs = (List<Job>) request.getAttribute("workingJobs");
+
+if(workingJobs != null && !workingJobs.isEmpty()){
+    for(Job job : workingJobs){
+%>
+
+<div class="job-card" style="border-left:5px solid green;">
+
+<h4><%= job.getTitle() %></h4>
+
+<p><b>Budget:</b> ₹<%= job.getBudget() %></p>
+<p><b>Duration:</b> <%= job.getDuration() %></p>
+<p><b>Level:</b> <%= job.getFreelancerLevel() %></p>
+
+<!-- ✅ CHAT -->
+<a class="btn"
+href="ChatServlet?jobId=<%=job.getJobId()%>">
+Open Project Chat
+</a>
+
+<!-- ✅ VIEW DETAILS (same modal reuse) -->
+<button class="btn"
+onclick="openModal(
+'<%= job.getJobId() %>',
+'<%= job.getTitle() != null ? job.getTitle().replace("'", "\\'") : "" %>',
+'<%= job.getBudget() %>',
+'<%= job.getDuration() != null ? job.getDuration() : "" %>',
+'<%= job.getFreelancerLevel() != null ? job.getFreelancerLevel() : "" %>',
+'<%= job.getComplexity() != null ? job.getComplexity() : "" %>',
+'<%= job.getDescription() != null ? job.getDescription().replace("'", "\\'") : "" %>'
+)">
+View Details
+</button>
+
+<!-- ❌ NO APPLY BUTTON HERE -->
+
+</div>
+
+<%
+    }
+} else {
+%>
+
+<p>No active projects yet.</p>
+
+<%
+}
+%>
 
 <h2>Available Jobs</h2>
 
@@ -409,7 +460,6 @@ onclick="openModal(
 '<%= job.getDescription().replace("'", "\'") %>'
 )">
 View Details </button>
-
 <button class="btn"
 onclick="openApplyModal('<%= job.getJobId() %>')">
 Apply for Job </button>

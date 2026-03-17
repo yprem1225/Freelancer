@@ -325,6 +325,89 @@ public class JobService {
         return jobs;
     }
     
+    //fetch working jobs
+    @SuppressWarnings("unchecked")
+	public List<Job> getWorkingJobsByUser(int userId) throws SQLException {
+
+        List<Job> jobs = new ArrayList<>();
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            String sql = "SELECT * FROM jobs WHERE status='WORKING' AND user_id=?";
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            JobSkillService skillservice = new JobSkillService();
+
+            while (rs.next()) {
+                Job job = new Job();
+
+                job.setJobId(rs.getInt("job_id"));
+                job.setUserId(rs.getInt("user_id"));
+                job.setTitle(rs.getString("title"));
+                job.setComplexity(rs.getString("complexity"));
+                job.setDuration(rs.getString("duration"));
+                job.setFreelancerLevel(rs.getString("freelancer_level"));
+                job.setBudget(rs.getString("budget"));
+                job.setDescription(rs.getString("description"));
+                job.setStatus(rs.getString("status"));
+
+                job.setSkills(skillservice.getSkillsByJobId(job.getJobId()));
+
+                jobs.add(job);
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return jobs;
+    }
+    
+    //diplay working jobs of that particular freelancer
+    public List<Job> getJobsByFreelancer(int freelancerId) {
+
+        List<Job> jobs = new ArrayList<>();
+
+        String query = "SELECT * FROM jobs WHERE assigned_freelancer_id=? AND status='WORKING'";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(query)) {
+
+            ps.setInt(1, freelancerId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Job job = new Job();
+
+                job.setJobId(rs.getInt("job_id"));
+                job.setTitle(rs.getString("title"));
+
+                // 🔥 Budget as STRING
+                job.setBudget(rs.getString("budget"));
+
+                job.setDuration(rs.getString("duration"));
+                job.setFreelancerLevel(rs.getString("freelancer_level")); 
+                job.setComplexity(rs.getString("complexity"));            
+                job.setDescription(rs.getString("description"));          
+
+                jobs.add(job);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return jobs;
+    }
+
+   
+    
     
     // display appiled jobs by the client
     public List<AppliedJob> getAppliedJobs(int freelancerId) {
