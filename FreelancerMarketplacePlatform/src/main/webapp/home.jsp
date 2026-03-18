@@ -504,8 +504,18 @@
                 for (Job job : activeJobs) {
             %>
                 <div class="job-card">
-                    <h3><a href="JobInfoServlet?id=<%= job.getJobId() %>"><%= job.getTitle() %></a></h3>
-                    <a href="ChatServlet?jobId=<%=job.getJobId()%>">Open Chat</a>
+                    <h3><%= job.getTitle() %></h3>
+                    <button class="post-project-btn"
+onclick="openModal(
+'<%= job.getTitle() != null ? job.getTitle().replace("'", "\\'") : "" %>',
+'<%= job.getBudget() %>',
+'<%= job.getDuration() != null ? job.getDuration() : "" %>',
+'<%= job.getFreelancerLevel() != null ? job.getFreelancerLevel() : "" %>',
+'<%= job.getComplexity() != null ? job.getComplexity() : "" %>',
+'<%= job.getDescription() != null ? job.getDescription().replace("'", "\\'") : "" %>'
+)">
+View Details
+</button>
                     <form action="DeleteJobServlet" method="post" onsubmit="return confirm('Permanently remove this project?');">
                         <input type="hidden" name="jobId" value="<%= job.getJobId() %>"/>
                         <button type="submit" class="delete-btn">Remove</button>
@@ -540,10 +550,20 @@
 
         <!-- WORKING JOB CARD -->
         <div class="job-card" style="border-left:5px solid #22c55e;">
-            <h3><a href="JobInfoServlet?id=<%= job.getJobId() %>"><%= job.getTitle() %></a></h3>
+            <h3><%= job.getTitle() %></h3>
 
             <a href="ChatServlet?jobId=<%=job.getJobId()%>">Open Chat</a>
-
+	<button class="post-project-btn"
+onclick="openModal(
+'<%= job.getTitle() != null ? job.getTitle().replace("'", "\\'") : "" %>',
+'<%= job.getBudget() %>',
+'<%= job.getDuration() != null ? job.getDuration() : "" %>',
+'<%= job.getFreelancerLevel() != null ? job.getFreelancerLevel() : "" %>',
+'<%= job.getComplexity() != null ? job.getComplexity() : "" %>',
+'<%= job.getDescription() != null ? job.getDescription().replace("'", "\\'") : "" %>'
+)">
+View Details
+</button>
             <div style="display:flex; gap:30px; margin-top:15px;">
                 <span><strong>Budget:</strong> ₹<%= job.getBudget() %></span>
                 <span><strong>Duration:</strong> <%= job.getDuration() %></span>
@@ -586,6 +606,25 @@
             <div id="modalBody"></div>
         </div>
     </div>
+    
+    <div id="jobModal" class="modal-overlay">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeJobModal()">&times;</span>
+
+        <div class="modal-header">
+            <h2 id="modalTitle"></h2>
+        </div>
+
+        <p><b>Budget:</b> ₹<span id="modalBudget"></span></p>
+        <p><b>Duration:</b> <span id="modalDuration"></span></p>
+        
+        <p><b>Freelancer Level:</b> <span id="modalLevel"></span></p>
+		<p><b>Complexity:</b> <span id="modalComplexity"></span></p>
+
+        <h3>Description</h3>
+        <p id="modalDescription"></p>
+    </div>
+</div>
 
     <footer class="footer">
         <div class="footer-grid">
@@ -646,6 +685,24 @@
             if (event.target == document.getElementById('resourceModal')) {
                 closeModal();
             }
+        }
+        
+        
+        function openModal(title, budget, duration, level, complexity, description){
+
+            document.getElementById("modalTitle").innerText = title;
+            document.getElementById("modalBudget").innerText = budget;
+            document.getElementById("modalDuration").innerText = duration;
+
+            document.getElementById("modalLevel").innerText = level;
+            document.getElementById("modalComplexity").innerText = complexity;
+
+            document.getElementById("modalDescription").innerText = description;
+
+            document.getElementById("jobModal").style.display = "flex";
+        }
+        function closeJobModal(){
+            document.getElementById("jobModal").style.display = "none";
         }
     </script>
 </body>

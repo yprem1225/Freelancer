@@ -441,14 +441,6 @@ for(Job job : activeJobs){
 <p><b>Duration:</b> <%= job.getDuration() %></p>
 <p><b>Level:</b> <%= job.getFreelancerLevel() %></p>
 
-<a class="btn"
-href="ChatServlet?jobId=<%=job.getJobId()%>">
-
-Open Project Chat
-
-</a>
-
-
 <button class="btn"
 onclick="openModal(
 '<%= job.getJobId() %>',
