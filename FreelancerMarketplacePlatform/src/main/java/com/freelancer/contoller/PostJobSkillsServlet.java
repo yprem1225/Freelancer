@@ -25,11 +25,16 @@ import com.freelancer.services.JobSkillService;
 
 	        HttpSession session = request.getSession(false);
 
-	        if (session == null || session.getAttribute("jobId") == null) {
-	            response.sendRedirect(request.getContextPath() + "/ClientProfileServlet");
-	            return;
+	        System.out.println("Session: " + session);
+	        if (session != null) {
+	            System.out.println("JobId in session: " + session.getAttribute("jobId"));
 	        }
 
+	        if (session == null || session.getAttribute("jobId") == null) {
+	            System.out.println("⚠ Session null or jobId missing — redirecting");
+	            response.sendRedirect(request.getContextPath() + "/views/home.jsp");
+	            return;
+	        }
 	        Integer jobId = (Integer) session.getAttribute("jobId");
 	        request.setAttribute("jobId", jobId);
 	        
