@@ -180,7 +180,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 
 /* ══ POPULAR SERVICES SECTION (replaces slider) ══ */
 .services-sec{
-  background:#fff;
+  background:#f1f5f9;
   padding:36px 2.5%;
   border-bottom:1.5px solid var(--g200);
 }
@@ -190,13 +190,14 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
   font-weight:700;
   color:var(--g800);
   margin-bottom:20px;
+  padding-left:80px;
 }
 .services-grid{
   display:flex;
   gap:16px;
-  overflow-x:auto;
+  flex-wrap:wrap;
+  justify-content:center;
   padding-bottom:6px;
-  scrollbar-width:none;
 }
 .services-grid::-webkit-scrollbar{display:none;}
 .svc-card{
@@ -352,14 +353,14 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 .fg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:30px;}
 .fb{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.35rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
 .fb .w{color:#fff;}.fb .p{color:#60a5fa;}
-.ftag{font-size:13px;color:#64748b;line-height:1.7;max-width:250px;}
-.fct{font-size:10px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
-.fl a{display:block;color:#64748b;font-size:13px;margin-bottom:8px;transition:color .18s,padding .18s;}
+.ftag{font-size:13px;color:#ffffff;line-height:1.7;max-width:250px;}
+.fct{font-size:10px;font-weight:800;color:#ffffff;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.fl a{display:block;color:#ffffff;font-size:13px;margin-bottom:8px;transition:color .18s,padding .18s;}
 .fl a:hover{color:#60a5fa;padding-left:4px;}
 .fbot{border-top:1px solid rgba(255,255,255,.06);padding-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
-.fbot p{font-size:12px;color:#334155;}
+.fbot p{font-size:12px;color:#ffffff;}
 .fs{display:flex;gap:6px;}
-.fs a{width:28px;height:28px;background:rgba(255,255,255,.05);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#475569;font-size:13px;border:1px solid rgba(255,255,255,.08);transition:all .18s;}
+.fs a{width:28px;height:28px;background:rgba(255,255,255,.05);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:13px;border:1px solid rgba(255,255,255,.08);transition:all .18s;}
 .fs a:hover{background:var(--blue);color:#fff;transform:translateY(-2px);}
 
 @media(max-width:860px){
@@ -523,6 +524,23 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
         <div class="svc-card-name">Video Editing</div>
       </div>
     </div>
+    
+    <div class="svc-card">
+  <img class="svc-card-bg" src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=400&h=300&q=80" alt="Data Analytics">
+  <div class="svc-card-overlay">
+    <div class="svc-card-sub">Make Smarter Decisions</div>
+    <div class="svc-card-name">Data Analytics</div>
+  </div>
+</div>
+
+<div class="svc-card">
+  <img class="svc-card-bg" src="https://images.unsplash.com/photo-1526378800651-c32d170fe6f8?auto=format&fit=crop&w=400&h=300&q=80" alt="Mobile App Development">
+  <div class="svc-card-overlay">
+    <div class="svc-card-sub">Go Mobile First</div>
+    <div class="svc-card-name">App Development</div>
+  </div>
+</div>
+
 
   </div>
 </section>
@@ -688,7 +706,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
     <div><div class="fct">Company</div><div class="fl"><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div></div>
   </div>
   <div class="fbot">
-    <p>&copy; 2025 WorkPort Technologies. All rights reserved.</p>
+    <p>&copy; 2025 WorkPort Technologies. All rights reserved. | Made by Prem Vikas Yadav</p>
     <div class="fs"><a href="#"><i class="bi bi-twitter-x"></i></a><a href="#"><i class="bi bi-linkedin"></i></a><a href="#"><i class="bi bi-github"></i></a></div>
   </div>
 </footer>
