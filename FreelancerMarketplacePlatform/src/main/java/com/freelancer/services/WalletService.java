@@ -134,5 +134,35 @@ public class WalletService {
         con.close();
         return list;
     }
+    
+    /**
+     * Credits a freelancer's wallet when a project payment is released.
+     * Call this from your project/payment servlet.
+     */
+    public void payFreelancer(int freelancerUserId, BigDecimal amount, String projectDescription)
+            throws ClassNotFoundException, SQLException {
+
+        // Ensure wallet exists
+        createWalletIdNotExist(freelancerUserId);
+
+        // Get wallet
+        Wallet wallet = getWalletByUser(freelancerUserId);
+        int walletId = wallet.getWalletId();
+
+        // Credit balance
+        addFunds(freelancerUserId, amount);
+
+        // Log transaction
+        String transactionId = "TXN" + System.currentTimeMillis();
+        saveTransaction(
+            transactionId,
+            freelancerUserId,
+            walletId,
+            amount,
+            "CREDIT",
+            "SUCCESS",
+            "Payment for: " + projectDescription
+        );
+    }
 
 }

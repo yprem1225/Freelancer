@@ -341,7 +341,7 @@ cursor:pointer;
 
 <div class="nav-right">
 
-<a href="WalletServlet" class="nav-link">💰 Wallet</a>
+<a href="FreelancerWalletServlet" class="nav-link">💰 Wallet</a>
 
 <a href="FreelancerProfileServlet" class="profile-box">
 
