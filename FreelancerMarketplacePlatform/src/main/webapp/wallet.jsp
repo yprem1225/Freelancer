@@ -8,185 +8,286 @@ List<Map<String, Object>> transactions =
 %>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>My Wallet</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wallet | WorkPort</title>
+    
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<style>
-body {
-    font-family: 'Segoe UI', Arial;
-    background: #f4f6f9;
-    padding: 40px;
-}
+    <style>
+        :root {
+            --blue: #2563eb;
+            --blue2: #1d4ed8;
+            --bluelt: #eff6ff;
+            --blue1: #dbeafe;
+            --dark: #0c1a3a;
+            --g50: #f9fafb;
+            --g100: #f3f4f6;
+            --g200: #e5e7eb;
+            --g400: #9ca3af;
+            --g600: #4b5563;
+            --g800: #1f2937;
+            --ok: #10b981;
+            --oklt: #ecfdf5;
+            --red: #ef4444;
+            --redlt: #fef2f2;
+            --s2: 0 10px 32px rgba(37,99,235,.13), 0 2px 8px rgba(0,0,0,.06);
+        }
 
-.container {
-    max-width: 900px;
-    margin: auto;
-}
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: #f1f5f9;
+            color: var(--g800);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    margin-bottom: 25px;
-}
+        h1, h2, h3 { font-family: 'Plus Jakarta Sans', sans-serif; }
 
-.balance {
-    font-size: 24px;
-    font-weight: bold;
-    color: #2e7d32;
-}
+        /* --- TOPBAR --- */
+        .topbar {
+            height: 64px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--g200);
+            display: flex; align-items: center;
+            padding: 0 5%;
+            position: sticky; top: 0; z-index: 1000;
+        }
 
-form input {
-    padding: 10px;
-    width: 180px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
+        .logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .logo-txt { font-size: 1.4rem; font-weight: 800; }
+        .logo-txt .w { color: var(--g800); }
+        .logo-txt .p { color: var(--blue); }
 
-button {
-    padding: 10px 18px;
-    background: #1976d2;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-}
+        .topbar-right { margin-left: auto; }
 
-button:hover {
-    background: #125aa0;
-}
+        .ghost-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px;
+            background: #fff; border: 1.5px solid var(--g200);
+            border-radius: 8px; font-size: 13px; font-weight: 700;
+            color: var(--g600); cursor: pointer; text-decoration: none;
+            transition: all .18s;
+        }
+        .ghost-btn:hover { border-color: var(--blue); color: var(--blue); background: var(--bluelt); }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 15px;
-}
+        /* --- MAIN CONTAINER --- */
+        .main-content {
+            flex: 1;
+            max-width: 900px;
+            margin: 40px auto;
+            width: 90%;
+        }
 
-table th {
-    background: #1976d2;
-    color: white;
-    padding: 12px;
-    text-align: center;
-}
+        /* --- BALANCE CARD --- */
+        .balance-card {
+            background: var(--dark);
+            background: linear-gradient(135deg, #0c1a3a 0%, #1e3a8a 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(12, 26, 58, 0.2);
+            margin-bottom: 30px;
+        }
 
-table td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #eee;
-}
+        .balance-card::after {
+            content: ''; position: absolute; top: -50px; right: -50px;
+            width: 200px; height: 200px; background: rgba(255,255,255,0.05);
+            border-radius: 50%;
+        }
 
-table tr:hover {
-    background: #f1f1f1;
-}
+        .balance-card h2 { font-size: 14px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.8; margin-bottom: 10px; }
+        .balance-card .amount { font-size: 3rem; font-weight: 800; font-family: 'Plus Jakarta Sans', sans-serif; }
+        .balance-card .user-info { margin-top: 15px; font-size: 13px; opacity: 0.7; display: flex; align-items: center; gap: 6px; }
 
-.credit {
-    color: #2e7d32;
-    font-weight: bold;
-}
+        /* --- ACTION CARD --- */
+        .action-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 20px;
+            border: 1.5px solid var(--g200);
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 30px;
+            box-shadow: var(--s2);
+        }
 
-.debit {
-    color: #c62828;
-    font-weight: bold;
-}
+        .action-info h3 { font-size: 18px; margin-bottom: 4px; color: var(--dark); }
+        .action-info p { font-size: 13px; color: var(--g400); }
 
-.success {
-    background: #e8f5e9;
-    color: #2e7d32;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 13px;
-}
+        .add-funds-form { display: flex; gap: 12px; }
 
-.failed {
-    background: #ffebee;
-    color: #c62828;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 13px;
-}
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--g400); }
 
-.back-link {
-    text-decoration: none;
-    color: #1976d2;
-    font-weight: bold;
-}
-</style>
+        .form-control {
+            padding: 12px 12px 12px 35px;
+            border: 2px solid var(--g200);
+            border-radius: 10px;
+            font-size: 15px;
+            width: 180px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .form-control:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 4px rgba(37,99,235,.1); }
 
+        .btn-primary {
+            background: var(--blue); color: #fff;
+            border: none; padding: 12px 24px; border-radius: 10px;
+            font-weight: 700; cursor: pointer; transition: all 0.2s;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btn-primary:hover { background: var(--blue2); transform: translateY(-1px); }
+
+        /* --- TRANSACTIONS --- */
+        .history-card {
+            background: #fff;
+            border-radius: 20px;
+            border: 1.5px solid var(--g200);
+            overflow: hidden;
+            box-shadow: var(--s2);
+        }
+
+        .history-header { padding: 24px; border-bottom: 1px solid var(--g200); }
+        .history-header h3 { font-size: 18px; color: var(--dark); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { background: var(--g50); padding: 16px; text-align: left; font-size: 12px; font-weight: 800; color: var(--g400); text-transform: uppercase; letter-spacing: 0.5px; }
+        td { padding: 18px 16px; font-size: 14px; border-bottom: 1px solid var(--g100); }
+
+        .txn-id { font-family: monospace; color: var(--g600); font-weight: 600; }
+        .amount-val { font-weight: 700; font-family: 'Plus Jakarta Sans', sans-serif; }
+
+        .credit { color: var(--ok); }
+        .debit { color: var(--red); }
+
+        .status-pill {
+            padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase;
+        }
+        .status-success { background: var(--oklt); color: var(--ok); }
+        .status-failed { background: var(--redlt); color: var(--red); }
+
+        @media (max-width: 700px) {
+            .action-card { flex-direction: column; gap: 20px; text-align: center; }
+            .add-funds-form { width: 100%; }
+            .form-control { width: 100%; }
+            .btn-primary { width: 100%; justify-content: center; }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
+    <nav class="topbar">
+        <a href="ClientHomeServlet" class="logo">
+            <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:32px;height:32px;">
+                <rect width="34" height="34" rx="9" fill="#2563eb"/>
+                <path d="M6 11.5L10 23L14 15.5L18 23L22 11.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="27" cy="13" r="3" fill="#06b6d4"/>
+                <line x1="24" y1="19.5" x2="30" y2="19.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <span class="logo-txt"><span class="w">Work</span><span class="p">Port</span></span>
+        </a>
+        <div class="topbar-right">
+            <a href="ClientHomeServlet" class="ghost-btn">
+                <i class="bi bi-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </nav>
 
-<div class="card">
-    <h2>My Wallet</h2>
-    <p>User ID: <strong><%= wallet.getUserId() %></strong></p>
-    <p class="balance">Current Balance: ₹ <%= wallet.getBalance() %></p>
-</div>
+    <div class="main-content">
+        
+        <div class="balance-card">
+            <h2>Available Balance</h2>
+            <div class="amount">$ <%= wallet.getBalance() %></div>
+            <div class="user-info">
+                <i class="bi bi-person-circle"></i> Wallet ID: #<%= wallet.getUserId() %>
+            </div>
+        </div>
 
-<div class="card">
-    <form action="WalletServlet" method="post">
-        <label>Add Funds:</label>
-        <input type="number" name="amount" required />
-        <button type="submit">Add Money</button>
-    </form>
-</div>
+        <div class="action-card">
+            <div class="action-info">
+                <h3>Quick Deposit</h3>
+                <p>Add funds to your account instantly.</p>
+            </div>
+            <form action="WalletServlet" method="post" class="add-funds-form">
+                <div class="input-wrapper">
+                    <i class="bi bi-currency-dollar"></i>
+                    <input type="number" name="amount" class="form-control" placeholder="0.00" required>
+                </div>
+                <button type="submit" class="btn-primary">
+                    <i class="bi bi-plus-lg"></i> Add Money
+                </button>
+            </form>
+        </div>
 
-<div class="card">
-    <h3>Transaction History</h3>
+        <div class="history-card">
+            <div class="history-header">
+                <h3>Transaction History</h3>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Transaction ID</th>
+                        <th>Amount</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <%
+                if (transactions != null && !transactions.isEmpty()) {
+                    for (Map<String, Object> txn : transactions) {
+                        String type = txn.get("type").toString();
+                        String status = txn.get("status").toString();
+                %>
+                    <tr>
+                        <td class="txn-id">#<%= txn.get("transaction_id") %></td>
+                        <td class="amount-val <%= type.equals("CREDIT") ? "credit" : "debit" %>">
+                            <%= type.equals("CREDIT") ? "+" : "-" %> $ <%= txn.get("amount") %>
+                        </td>
+                        <td>
+                            <span style="font-weight: 600; font-size: 13px; color: var(--g600);">
+                                <%= type %>
+                            </span>
+                        </td>
+                        <td>
+                            <span class="status-pill <%= status.equals("SUCCESS") ? "status-success" : "status-failed" %>">
+                                <%= status %>
+                            </span>
+                        </td>
+                    </tr>
+                <%
+                    }
+                } else {
+                %>
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--g400); padding: 40px;">
+                            <i class="bi bi-clock-history" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                            No transactions found yet.
+                        </td>
+                    </tr>
+                <%
+                }
+                %>
+                </tbody>
+            </table>
+        </div>
 
-    <table>
-        <tr>
-            <th>Transaction ID</th>
-            <th>Amount</th>
-            <th>Type</th>
-            <th>Status</th>
-        </tr>
+    </div>
 
-<%
-if (transactions != null && !transactions.isEmpty()) {
-    for (Map<String, Object> txn : transactions) {
-
-        String type = txn.get("type").toString();
-        String status = txn.get("status").toString();
-%>
-        <tr>
-            <td><%= txn.get("transaction_id") %></td>
-
-            <td class="<%= type.equals("CREDIT") ? "credit" : "debit" %>">
-                ₹ <%= txn.get("amount") %>
-            </td>
-
-            <td class="<%= type.equals("CREDIT") ? "credit" : "debit" %>">
-                <%= type %>
-            </td>
-
-            <td>
-                <span class="<%= status.equals("SUCCESS") ? "success" : "failed" %>">
-                    <%= status %>
-                </span>
-            </td>
-        </tr>
-<%
-    }
-} else {
-%>
-        <tr>
-            <td colspan="4">No transactions found</td>
-        </tr>
-<%
-}
-%>
-
-    </table>
-</div>
-
-<a class="back-link" href="ClientHomeServlet">⬅ Back to Home</a>
-
-</div>
+    <footer style="text-align:center; padding: 40px; color: var(--g400); font-size: 13px;">
+        &copy; 2026 WorkPort Marketplace Inc. &bull; Secure Payments
+    </footer>
 
 </body>
 </html>

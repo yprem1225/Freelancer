@@ -615,100 +615,127 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 
   <hr class="div">
 
-  <!-- ONGOING PROJECTS -->
-<%
-if (workingJobs != null && !workingJobs.isEmpty()) {
-    EscrowService escrowService = new EscrowService();
-    int clientSessionId = Integer.parseInt(session.getAttribute("id").toString());
+  <!-- ONGOING PROJECTS — matches Active Listings layout exactly -->
 
-    for (Job job : workingJobs) {
-        String st   = (job.getTitle()!=null) ? job.getTitle().replace("&","&amp;").replace("\"","&quot;") : "";
-        String sb   = String.valueOf(job.getBudget());
-        String sd   = (job.getDuration()!=null) ? job.getDuration().replace("\"","&quot;") : "";
-        String sl   = (job.getFreelancerLevel()!=null) ? job.getFreelancerLevel().replace("\"","&quot;") : "";
-        String sc2  = (job.getComplexity()!=null) ? job.getComplexity().replace("\"","&quot;") : "";
-        String sde  = (job.getDescription()!=null) ? job.getDescription().replace("&","&amp;").replace("\"","&quot;").replace("<","&lt;") : "";
+<%-- Section header --%>
+<div class="sh rv">
+  <div class="sht"><div class="shi"><i class="bi bi-person-workspace"></i></div>Ongoing Projects</div>
+  <span class="shb"><%= (workingJobs != null ? workingJobs.size() : 0) %> project<%= (workingJobs != null && workingJobs.size() == 1) ? "" : "s" %></span>
+</div>
 
-        // Check escrow status for this job
-        java.util.Map<String,Object> escrow = null;
-        try { escrow = escrowService.getEscrowByJob(job.getJobId()); } catch(Exception ignore) {}
-        boolean escrowHeld     = escrow != null && "HELD".equals(escrow.get("status"));
-        boolean escrowReleased = escrow != null && "RELEASED".equals(escrow.get("status"));
-        java.math.BigDecimal escrowAmt = escrow != null ? (java.math.BigDecimal) escrow.get("amount") : java.math.BigDecimal.ZERO;
-%>
-        <div class="jcard og">
-          <div class="jcard-top">
-            <div class="jcard-ico" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d;">
-              <i class="bi bi-person-workspace"></i>
-            </div>
-            <div class="jcard-title-wrap">
-              <div class="jcard-name"><%= job.getTitle() %></div>
-              <span class="jcard-status-badge badge-green">In Progress</span>
-            </div>
-            <button class="jcard-menu">&#8230;</button>
+<%-- Scrollable card row with arrows --%>
+<div class="card-scroll-wrap rv">
+  <button class="row-arr row-arr-l" onclick="scrollRow('ongoingRow',-1)"><i class="bi bi-chevron-left"></i></button>
+
+  <div class="card-row" id="ongoingRow">
+
+    <%
+    if (workingJobs == null || workingJobs.isEmpty()) {
+    %>
+      <div class="empty">
+        <div class="ei"><i class="bi bi-gear"></i></div>
+        <h4>No ongoing projects</h4>
+        <p>Once you hire a freelancer, active work appears here.</p>
+      </div>
+    <%
+    } else {
+        EscrowService escrowService = new EscrowService();
+        int clientSessionId = Integer.parseInt(session.getAttribute("id").toString());
+
+        for (Job job : workingJobs) {
+            String st  = (job.getTitle()!=null)           ? job.getTitle().replace("&","&amp;").replace("\"","&quot;")                                                  : "";
+            String sb  = String.valueOf(job.getBudget());
+            String sd  = (job.getDuration()!=null)        ? job.getDuration().replace("\"","&quot;")                                                                    : "";
+            String sl  = (job.getFreelancerLevel()!=null) ? job.getFreelancerLevel().replace("\"","&quot;")                                                             : "";
+            String sc2 = (job.getComplexity()!=null)      ? job.getComplexity().replace("\"","&quot;")                                                                  : "";
+            String sde = (job.getDescription()!=null)     ? job.getDescription().replace("&","&amp;").replace("\"","&quot;").replace("<","&lt;")                       : "";
+
+            java.util.Map<String,Object> escrow = null;
+            try { escrow = escrowService.getEscrowByJob(job.getJobId()); } catch(Exception ignore) {}
+            boolean escrowHeld     = escrow != null && "HELD".equals(escrow.get("status"));
+            boolean escrowReleased = escrow != null && "RELEASED".equals(escrow.get("status"));
+            java.math.BigDecimal escrowAmt = escrow != null ? (java.math.BigDecimal) escrow.get("amount") : java.math.BigDecimal.ZERO;
+    %>
+      <div class="jcard og">
+
+        <%-- Card top --%>
+        <div class="jcard-top">
+          <div class="jcard-ico" style="background:#f0fdf4;border-color:#bbf7d0;color:#15803d;">
+            <i class="bi bi-person-workspace"></i>
           </div>
-
-          <div class="jcard-meta">
-            <span><i class="bi bi-currency-rupee"></i>&#8377;<%= job.getBudget() %></span>
-            <span><i class="bi bi-clock"></i><%= job.getDuration() %></span>
-            <%-- Escrow status badge --%>
-            <% if (escrowHeld) { %>
-              <span style="background:#fef9c3;color:#854d0e;border-color:#fef08a;">
-                <i class="bi bi-lock-fill" style="color:#b45309;"></i>
-                ₹<%= escrowAmt %> in escrow
-              </span>
-            <% } else if (escrowReleased) { %>
-              <span style="background:#dcfce7;color:#15803d;border-color:#bbf7d0;">
-                <i class="bi bi-check-circle-fill"></i> Payment released
-              </span>
-            <% } %>
+          <div class="jcard-title-wrap">
+            <div class="jcard-name"><%= job.getTitle() %></div>
+            <span class="jcard-status-badge badge-green">In Progress</span>
           </div>
-
-          <div class="jcard-desc"><%= (job.getDescription()!=null&&!job.getDescription().isEmpty()) ? job.getDescription() : "No description provided." %></div>
-
-          <div class="jcard-actions">
-
-            <%-- Chat button --%>
-            <a href="ChatServlet?jobId=<%= job.getJobId() %>"
-               style="text-decoration:none;flex:1;justify-content:center;display:inline-flex;align-items:center;gap:5px;padding:9px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#15803d;transition:transform .2s,box-shadow .2s,background .2s,color .2s,border-color .2s;white-space:nowrap;">
-              <i class="bi bi-chat-dots-fill"></i> Chat
-            </a>
-
-            <%-- Details button --%>
-            <button class="bv"
-              data-title="<%= st %>" data-budget="<%= sb %>"
-              data-dur="<%= sd %>" data-level="<%= sl %>"
-              data-comp="<%= sc2 %>" data-desc="<%= sde %>"
-              onclick="openJM(this)">
-              <i class="bi bi-eye"></i> Details
-            </button>
-
-            <%-- Release Payment button — only shown when escrow is HELD --%>
-            <% if (escrowHeld) { %>
-              <form action="ReleasePaymentServlet" method="post" style="margin:0;flex:1;"
-                    onsubmit="return confirm('Release ₹<%= escrowAmt %> to the freelancer and mark this project as completed?');">
-                <input type="hidden" name="jobId" value="<%= job.getJobId() %>">
-                <button type="submit"
-                  style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;border:1.5px solid #fbbf24;background:#fef9c3;color:#92400e;cursor:pointer;transition:all .2s;white-space:nowrap;"
-                  onmouseover="this.style.background='#f59e0b';this.style.color='#fff';this.style.borderColor='#d97706';"
-                  onmouseout="this.style.background='#fef9c3';this.style.color='#92400e';this.style.borderColor='#fbbf24';">
-                  <i class="bi bi-unlock-fill"></i> Release ₹<%= escrowAmt %>
-                </button>
-              </form>
-            <% } %>
-
-          </div>
+          <button class="jcard-menu">&#8230;</button>
         </div>
-<%
-    }
-} else { %>
-    <div class="empty">
-      <div class="ei"><i class="bi bi-gear"></i></div>
-      <h4>No ongoing projects</h4>
-      <p>Once you hire a freelancer, active work appears here.</p>
-    </div>
-<% } %>
 
+        <%-- Meta row --%>
+        <div class="jcard-meta">
+          <span><i class="bi bi-currency-rupee"></i>&#8377;<%= job.getBudget() %></span>
+          <span><i class="bi bi-clock"></i><%= job.getDuration() %></span>
+          <% if (escrowHeld) { %>
+            <span style="background:#fef9c3;color:#854d0e;border-color:#fef08a;">
+              <i class="bi bi-lock-fill" style="color:#b45309;"></i>
+              &#8377;<%= escrowAmt %> in escrow
+            </span>
+          <% } else if (escrowReleased) { %>
+            <span style="background:#dcfce7;color:#15803d;border-color:#bbf7d0;">
+              <i class="bi bi-check-circle-fill"></i> Payment released
+            </span>
+          <% } %>
+        </div>
+
+        <%-- Description --%>
+        <div class="jcard-desc">
+          <%= (job.getDescription()!=null && !job.getDescription().isEmpty()) ? job.getDescription() : "No description provided." %>
+        </div>
+
+        <%-- Actions --%>
+        <div class="jcard-actions">
+
+          <%-- Chat --%>
+          <a href="ChatServlet?jobId=<%= job.getJobId() %>"
+             style="text-decoration:none;flex:1;justify-content:center;display:inline-flex;align-items:center;gap:5px;padding:9px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;border:1.5px solid #bbf7d0;background:#f0fdf4;color:#15803d;transition:transform .2s,box-shadow .2s,background .2s,color .2s,border-color .2s;white-space:nowrap;">
+            <i class="bi bi-chat-dots-fill"></i> Chat
+          </a>
+
+          <%-- Details --%>
+          <button class="bv"
+            data-title="<%= st %>" data-budget="<%= sb %>"
+            data-dur="<%= sd %>"  data-level="<%= sl %>"
+            data-comp="<%= sc2 %>" data-desc="<%= sde %>"
+            onclick="openJM(this)">
+            <i class="bi bi-eye"></i> Details
+          </button>
+
+          <%-- Release Payment — only when escrow HELD --%>
+          <% if (escrowHeld) { %>
+            <form action="ReleasePaymentServlet" method="post" style="margin:0;flex:1;"
+                  onsubmit="return confirm('Release &#8377;<%= escrowAmt %> to the freelancer and mark this project as completed?');">
+              <input type="hidden" name="jobId" value="<%= job.getJobId() %>">
+              <button type="submit"
+                style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;border:1.5px solid #fbbf24;background:#fef9c3;color:#92400e;cursor:pointer;transition:all .2s;white-space:nowrap;"
+                onmouseover="this.style.background='#f59e0b';this.style.color='#fff';this.style.borderColor='#d97706';"
+                onmouseout="this.style.background='#fef9c3';this.style.color='#92400e';this.style.borderColor='#fbbf24';">
+                <i class="bi bi-unlock-fill"></i> Release &#8377;<%= escrowAmt %>
+              </button>
+            </form>
+          <% } %>
+
+        </div>
+      </div>
+    <%
+        } // end for
+    } // end else
+    %>
+
+  </div><%-- end #ongoingRow --%>
+
+  <button class="row-arr row-arr-r" onclick="scrollRow('ongoingRow',1)"><i class="bi bi-chevron-right"></i></button>
+</div>
+
+<hr class="div">
 
   <!-- RESOURCE CENTER -->
   <div class="sh rv">
