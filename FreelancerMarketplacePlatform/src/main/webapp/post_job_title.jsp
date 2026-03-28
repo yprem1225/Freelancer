@@ -289,7 +289,7 @@ h1,h2,h3{font-family:'Plus Jakarta Sans',sans-serif;}
 
       <div class="actions">
         <a href="<%= request.getContextPath() %>/GoHomeServlet" class="ghost-btn">
-          <i class="bi bi-arrow-left"></i> Back to Home
+          <i class="bi bi-arrow-left"></i> Back to DashBoard
         </a>
         <button type="submit" class="btn-next" id="nextBtn" disabled>
           Continue <i class="bi bi-arrow-right"></i>

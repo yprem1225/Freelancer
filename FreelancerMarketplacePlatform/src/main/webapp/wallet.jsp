@@ -183,6 +183,22 @@ List<Map<String, Object>> transactions =
             .form-control { width: 100%; }
             .btn-primary { width: 100%; justify-content: center; }
         }
+        
+        /* footer */
+.ft{background:var(--dark);padding:44px 2.5% 22px;}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:30px;}
+.fb{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.35rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.fb .w{color:#fff;}.fb .p{color:#60a5fa;}
+.ftag{font-size:13px;color:#ffffff;line-height:1.7;max-width:250px;}
+.fct{font-size:10px;font-weight:800;color:#ffffff;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.fl a{display:block;color:#ffffff;font-size:13px;margin-bottom:8px;transition:color .18s,padding .18s;}
+.fl a:hover{color:#60a5fa;padding-left:4px;}
+.fbot{border-top:1px solid rgba(255,255,255,.06);padding-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.fbot p{font-size:12px;color:#ffffff;}
+.fs{display:flex;gap:6px;}
+.fs a{width:28px;height:28px;background:rgba(255,255,255,.05);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:13px;border:1px solid rgba(255,255,255,.08);transition:all .18s;}
+.fs a:hover{background:var(--blue);color:#fff;transform:translateY(-2px);}
+        
     </style>
 </head>
 <body>
@@ -199,7 +215,7 @@ List<Map<String, Object>> transactions =
         </a>
         <div class="topbar-right">
             <a href="ClientHomeServlet" class="ghost-btn">
-                <i class="bi bi-arrow-left"></i> Back to Home
+                <i class="bi bi-arrow-left"></i> Back to DashBoard
             </a>
         </div>
     </nav>
@@ -285,9 +301,29 @@ List<Map<String, Object>> transactions =
 
     </div>
 
-    <footer style="text-align:center; padding: 40px; color: var(--g400); font-size: 13px;">
-        &copy; 2026 WorkPort Marketplace Inc. &bull; Secure Payments
-    </footer>
+    <footer class="ft">
+  <div class="fg">
+    <div>
+      <div class="fb">
+        <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:26px;height:26px;flex-shrink:0;">
+          <rect width="34" height="34" rx="9" fill="#2563eb"/>
+          <path d="M6 11.5L10 23L14 15.5L18 23L22 11.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="27" cy="13" r="3" fill="#06b6d4"/>
+          <line x1="24" y1="19.5" x2="30" y2="19.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="w">Work</span><span class="p">Port</span>
+      </div>
+      <p class="ftag">Connecting businesses with top-tier global talent — securely, quickly, at scale.</p>
+    </div>
+    <div><div class="fct">Support</div><div class="fl"><a href="#">Help Center</a><a href="#">Safety &amp; Security</a><a href="#">Privacy Policy</a></div></div>
+    <div><div class="fct">Company</div><div class="fl"><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div></div>
+  </div>
+  <div class="fbot">
+    <p>&copy; 2025 WorkPort Technologies. All rights reserved. | Made by Prem Vikas Yadav</p>
+    <div class="fs"><a href="#"><i class="bi bi-twitter-x"></i></a><a href="#"><i class="bi bi-linkedin"></i></a><a href="#"><i class="bi bi-github"></i></a></div>
+  </div>
+</footer>
+
 
 </body>
 </html>

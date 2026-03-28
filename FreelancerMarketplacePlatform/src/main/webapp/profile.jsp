@@ -28,6 +28,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <!-- intl-tel-input CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@23.7.3/build/css/intlTelInput.css">
+
     <style>
         :root {
             --blue: #2563eb;
@@ -180,6 +183,54 @@
 
         textarea.form-control { min-height: 120px; resize: vertical; line-height: 1.6; }
 
+        /* --- intl-tel-input overrides to match existing form style --- */
+        .iti {
+            width: 100%;
+        }
+
+        .iti__tel-input {
+            width: 100%;
+            padding: 12px 16px 12px 52px !important;
+            border: 2px solid var(--g200) !important;
+            border-radius: 10px !important;
+            font-size: 14px !important;
+            font-family: 'DM Sans', sans-serif !important;
+            color: var(--g800) !important;
+            transition: all 0.2s !important;
+            background: #fff !important;
+            height: auto !important;
+        }
+
+        .iti__tel-input:focus {
+            outline: none !important;
+            border-color: var(--blue) !important;
+            box-shadow: 0 0 0 4px rgba(37,99,235,.1) !important;
+        }
+
+        .iti__flag-container {
+            padding: 0 !important;
+        }
+
+        .iti__selected-dial-code {
+            font-size: 13px;
+            font-family: 'DM Sans', sans-serif;
+            color: var(--g600);
+        }
+
+        .iti__country-list {
+            border-radius: 10px;
+            border: 1.5px solid var(--g200);
+            box-shadow: var(--s2);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            z-index: 1001;
+        }
+
+        .iti__country-list .iti__country.iti__highlight {
+            background: var(--bluelt);
+        }
+
+        /* --- BUTTON --- */
         .btn-update {
             width: 100%;
             padding: 14px;
@@ -235,29 +286,21 @@
             color: <%= profileComplete ? "var(--ok)" : "var(--red)" %>;
         }
 
-        /* --- FOOTER --- */
-        .footer {
-            background: var(--dark);
-            color: #fff;
-            padding: 60px 5% 30px;
-            margin-top: auto;
-        }
+        /* footer */
+.ft{background:var(--dark);padding:44px 2.5% 22px;}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:30px;}
+.fb{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.35rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.fb .w{color:#fff;}.fb .p{color:#60a5fa;}
+.ftag{font-size:13px;color:#ffffff;line-height:1.7;max-width:250px;}
+.fct{font-size:10px;font-weight:800;color:#ffffff;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.fl a{display:block;color:#ffffff;font-size:13px;margin-bottom:8px;transition:color .18s,padding .18s;}
+.fl a:hover{color:#60a5fa;padding-left:4px;}
+.fbot{border-top:1px solid rgba(255,255,255,.06);padding-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.fbot p{font-size:12px;color:#ffffff;}
+.fs{display:flex;gap:6px;}
+.fs a{width:28px;height:28px;background:rgba(255,255,255,.05);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#ffffff;font-size:13px;border:1px solid rgba(255,255,255,.08);transition:all .18s;}
+.fs a:hover{background:var(--blue);color:#fff;transform:translateY(-2px);}
 
-        .footer-grid {
-            max-width: 1100px; margin: 0 auto;
-            display: grid; grid-template-columns: 2fr 1fr; gap: 40px;
-        }
-
-        .footer h4 { margin-bottom: 15px; font-size: 16px; color: #fff; }
-        .footer p { color: var(--g400); font-size: 14px; line-height: 1.6; max-width: 300px; }
-        .footer a { color: var(--g400); text-decoration: none; font-size: 14px; transition: 0.2s; }
-        .footer a:hover { color: var(--blue3); }
-
-        @media (max-width: 600px) {
-            .info-grid { grid-template-columns: 1fr; }
-            .profile-card { padding: 25px; }
-            .footer-grid { grid-template-columns: 1fr; }
-        }
     </style>
 </head>
 <body>
@@ -273,7 +316,7 @@
             <span class="logo-txt"><span class="w">Work</span><span class="p">Port</span></span>
         </a>
         <div class="topbar-right">
-            <a href="ClientHomeServlet" class="ghost-btn"><i class="bi bi-house-door"></i> Dashboard</a>
+            <a href="ClientHomeServlet" class="ghost-btn"><i class="bi bi-house-door"></i>Home</a>
             <a href="LogoutServlet" class="ghost-btn btn-logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
         </div>
     </nav>
@@ -300,10 +343,14 @@
                 </div>
             </div>
 
-            <form action="ClientProfileServlet" method="post">
+            <form action="ClientProfileServlet" method="post" id="profileForm">
                 <div class="form-group">
                     <label class="form-label">Phone Number</label>
-                    <input type="text" class="form-control" name="phone" placeholder="+1 (555) 000-0000"
+                    <!-- Hidden input that stores the full international number submitted to the server -->
+                    <input type="hidden" name="phone" id="phoneHidden">
+                    <!-- intl-tel-input is attached to this input; its value is NOT submitted directly -->
+                    <input type="tel" id="phoneInput" class="form-control"
+                           placeholder="+1 (555) 000-0000"
                            value="<%= profile.getPhone()==null?"":profile.getPhone() %>">
                 </div>
 
@@ -347,25 +394,52 @@
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="footer-grid">
-            <div>
-                <div class="logo" style="margin-bottom: 15px;">
-                    <span class="logo-txt"><span class="w" style="color:#fff;">Work</span><span class="p">Port</span></span>
-                </div>
-                <p>Connecting world-class companies with the best freelance talent across the globe.</p>
-            </div>
-            <div>
-                <h4>Resources</h4>
-                <a href="#">Help Center</a><br>
-                <a href="#">Privacy Policy</a><br>
-                <a href="#">Terms of Service</a>
-            </div>
-        </div>
-        <div style="text-align:center; margin-top:40px; color:#4b5563; font-size:12px; border-top: 1px solid #1f2937; padding-top: 20px;">
-            &copy; 2026 WorkPort Marketplace Inc.
-        </div>
-    </footer>
+   <!-- FOOTER -->
+<footer class="ft">
+  <div class="fg">
+    <div>
+      <div class="fb">
+        <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:26px;height:26px;flex-shrink:0;">
+          <rect width="34" height="34" rx="9" fill="#2563eb"/>
+          <path d="M6 11.5L10 23L14 15.5L18 23L22 11.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="27" cy="13" r="3" fill="#06b6d4"/>
+          <line x1="24" y1="19.5" x2="30" y2="19.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="w">Work</span><span class="p">Port</span>
+      </div>
+      <p class="ftag">Connecting businesses with top-tier global talent — securely, quickly, at scale.</p>
+    </div>
+    <div><div class="fct">Support</div><div class="fl"><a href="#">Help Center</a><a href="#">Safety &amp; Security</a><a href="#">Privacy Policy</a></div></div>
+    <div><div class="fct">Company</div><div class="fl"><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div></div>
+  </div>
+  <div class="fbot">
+    <p>&copy; 2025 WorkPort Technologies. All rights reserved. | Made by Prem Vikas Yadav</p>
+    <div class="fs"><a href="#"><i class="bi bi-twitter-x"></i></a><a href="#"><i class="bi bi-linkedin"></i></a><a href="#"><i class="bi bi-github"></i></a></div>
+  </div>
+</footer>
+
+    <!-- intl-tel-input JS -->
+    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.7.3/build/js/intlTelInput.min.js"></script>
+    <script>
+        const phoneInput = document.querySelector("#phoneInput");
+        const phoneHidden = document.querySelector("#phoneHidden");
+
+        const iti = window.intlTelInput(phoneInput, {
+            initialCountry: "auto",
+            geoIpLookup: function(callback) {
+                fetch("https://ipapi.co/json")
+                    .then(res => res.json())
+                    .then(data => callback(data.country_code))
+                    .catch(() => callback("us"));
+            },
+            loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.7.3/build/js/utils.js",
+        });
+
+        // Before form submits, copy the full international number into the hidden input
+        document.querySelector("#profileForm").addEventListener("submit", function () {
+            phoneHidden.value = iti.getNumber();
+        });
+    </script>
 
 </body>
 </html>

@@ -225,7 +225,7 @@
             <span class="logo-txt"><span class="w">Work</span><span class="p">Port</span></span>
         </a>
         <a href="ClientHomeServlet" class="btn-home">
-            <i class="bi bi-house-door"></i> Back to Home
+            <i class="bi bi-house-door"></i> Back to DashBoard
         </a>
     </nav>
 

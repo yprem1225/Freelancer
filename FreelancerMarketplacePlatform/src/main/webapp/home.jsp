@@ -52,6 +52,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 .d1{transition-delay:.07s;}.d2{transition-delay:.14s;}.d3{transition-delay:.21s;}.d4{transition-delay:.28s;}
 
 /* ══ NAVBAR ══ */
+/* ══ NAVBAR ══ */
 .nav{
   position:fixed;top:0;left:0;right:0;height:var(--navh);z-index:900;
   display:flex;align-items:center;padding:0 2.5%;gap:8px;
@@ -64,29 +65,39 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 .logo-svg{width:34px;height:34px;}
 .logo-txt{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.3px;}
 .logo-txt .w{color:var(--g800);}.logo-txt .p{color:var(--blue);}
-.nlinks{display:flex;align-items:center;gap:2px;margin-left:16px;}
+
+/* ↓ increased gap between nav items */
+.nlinks{display:flex;align-items:center;gap:6px;margin-left:24px;}
+
 .ni{position:relative;}
-.nl{display:flex;align-items:center;gap:4px;padding:6px 10px;font-size:13.5px;font-weight:600;color:var(--g600);border-radius:var(--rs);transition:all .18s;cursor:pointer;white-space:nowrap;}
+
+/* ↓ larger font, more padding, bolder */
+.nl{display:flex;align-items:center;gap:5px;padding:8px 14px;font-size:15px;font-weight:700;color:var(--g600);border-radius:var(--rs);transition:all .18s;cursor:pointer;white-space:nowrap;}
+
 .nl:hover{color:var(--blue);background:var(--bluelt);}
 .ca{font-size:10px;transition:transform .18s;}
 .ni:hover .ca{transform:rotate(180deg);}
-.dd{position:absolute;top:calc(100% + 6px);left:0;background:#fff;border:1px solid var(--g200);border-radius:var(--r);box-shadow:var(--s2);padding:6px;min-width:195px;opacity:0;visibility:hidden;transform:translateY(-5px);transition:all .2s cubic-bezier(.22,1,.36,1);z-index:200;}
+.dd{position:absolute;top:calc(100% + 8px);left:0;background:#fff;border:1px solid var(--g200);border-radius:var(--r);box-shadow:var(--s2);padding:6px;min-width:195px;opacity:0;visibility:hidden;transform:translateY(-5px);transition:all .2s cubic-bezier(.22,1,.36,1);z-index:200;}
 .ni:hover .dd{opacity:1;visibility:visible;transform:none;}
 .dd a{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--rs);font-size:13px;font-weight:600;color:var(--g600);transition:all .16s;}
 .dd a i{font-size:14px;color:var(--blue3);}
 .dd a:hover{background:var(--bluelt);color:var(--blue);padding-left:16px;}
-.nr{display:flex;align-items:center;gap:7px;margin-left:auto;}
-.nibtn{width:36px;height:36px;border-radius:9px;border:1.5px solid var(--g200);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--g600);font-size:15px;position:relative;transition:all .18s;}
+
+/* ↓ more breathing room on the right side */
+.nr{display:flex;align-items:center;gap:10px;margin-left:auto;}
+
+/* ↓ slightly larger icon buttons */
+.nibtn{width:38px;height:38px;border-radius:9px;border:1.5px solid var(--g200);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--g600);font-size:16px;position:relative;transition:all .18s;}
+
 .nibtn:hover{border-color:var(--blue3);color:var(--blue);background:var(--bluelt);transform:translateY(-1px);}
 .nbadge{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--err);border-radius:50%;border:1.5px solid #fff;}
-.nprof{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:8px;transition:background .18s;}
+.nprof{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:8px;transition:background .18s;}
 .nprof:hover{background:var(--g100);}
 .navtr{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--blue),var(--cyan));color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
 .nname{font-size:13px;font-weight:700;color:var(--g800);}
 .nrole{font-size:10px;font-weight:700;color:var(--blue);background:var(--bluelt);padding:1px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.3px;display:block;}
-.nbtn{display:flex;align-items:center;gap:5px;padding:7px 13px;background:transparent;border:1.5px solid var(--g200);border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--g600);transition:all .18s;}
+.nbtn{display:flex;align-items:center;gap:5px;padding:7px 14px;background:transparent;border:1.5px solid var(--g200);border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--g600);transition:all .18s;}
 .nbtn:hover{border-color:var(--err);color:var(--err);background:#fff5f5;}
-
 /* ══ HERO — Fiverr-style with diagonal split & professional person image ══ */
 .hero{
   margin-top:var(--navh);
@@ -387,7 +398,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 
 <!-- NAVBAR -->
 <nav class="nav" id="nav">
-  <a href="client_home.jsp" class="logo">
+  <a href="home.jsp" class="logo">
     <svg class="logo-svg" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect width="34" height="34" rx="9" fill="#2563eb"/>
       <path d="M6 11.5L10 23L14 15.5L18 23L22 11.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -407,7 +418,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
     <div class="ni"><span class="nl">Reports <span class="ca">&#9660;</span></span>
       <div class="dd"><a href="#"><i class="bi bi-bar-chart-line"></i> Weekly Summary</a></div>
     </div>
-    <a href="#" class="nl"><i class="bi bi-chat-dots"></i> Messages</a>
+    
   </div>
   <div class="nr">
     <a href="NotificationServlet" class="nibtn"><i class="bi bi-bell"></i><span class="nbadge"></span></a>
