@@ -892,7 +892,7 @@
 
             <button class="join-btn" id="joinBtn" onclick="goSignup()" disabled>Join WorkPort</button>
 
-            <div class="login-link">Already have an account? <a href="login.jsp">Log In</a></div>
+   
         </div>
     </div>
 </section>

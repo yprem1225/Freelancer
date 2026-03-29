@@ -726,11 +726,12 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
                   onsubmit="return confirm('Release &#8377;<%= escrowAmt %> to the freelancer and mark this project as completed?');">
               <input type="hidden" name="jobId" value="<%= job.getJobId() %>">
               <button type="submit"
-                style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;border:1.5px solid #fbbf24;background:#fef9c3;color:#92400e;cursor:pointer;transition:all .2s;white-space:nowrap;"
-                onmouseover="this.style.background='#f59e0b';this.style.color='#fff';this.style.borderColor='#d97706';"
-                onmouseout="this.style.background='#fef9c3';this.style.color='#92400e';this.style.borderColor='#fbbf24';">
-                <i class="bi bi-unlock-fill"></i> Release &#8377;<%= escrowAmt %>
-              </button>
+    style="width:100%;display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;border:1.5px solid #fbbf24;background:#fef9c3;color:#92400e;cursor:pointer;transition:all .2s;white-space:nowrap;"
+    onmouseover="this.style.background='#f59e0b';this.style.color='#fff';this.style.borderColor='#d97706';"
+    onmouseout="this.style.background='#fef9c3';this.style.color='#92400e';this.style.borderColor='#fbbf24';">
+    
+    Release &#8377;<%= escrowAmt %>
+</button>
             </form>
           <% } %>
 

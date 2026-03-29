@@ -54,7 +54,9 @@ public class ClientService {
 		
 		completed+=2; // name and email already filled after login/SignUp
 		
-		if(profile.getPhone()!=null && !profile.getPhone().isEmpty()) completed++;
+		String phone = profile.getPhone();
+		// Strip spaces, dashes — just check it has enough digits
+		if (phone != null && phone.replaceAll("\\s+", "").matches("\\+?\\d{7,15}")) completed++;
 		if(profile.getCompanyname()!=null && !profile.getCompanyname().isEmpty()) completed++;
 		if(profile.getCompanybio()!=null && !profile.getCompanybio().isEmpty()) completed++;
 		

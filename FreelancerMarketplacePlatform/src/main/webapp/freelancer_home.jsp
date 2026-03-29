@@ -5,551 +5,890 @@
 
 <%
 FreelancerProfile profile = (FreelancerProfile) request.getAttribute("profile");
-
-if(profile == null){
-response.sendRedirect("login.jsp");
-return;
-}
+if (profile == null) { response.sendRedirect("login.jsp"); return; }
 
 int completed = 30;
+if (profile.getPhone()     != null && !profile.getPhone().trim().isEmpty())      completed += 10;
+if (profile.getTitle()     != null && !profile.getTitle().trim().isEmpty())      completed += 15;
+if (profile.getSkills()    != null && !profile.getSkills().trim().isEmpty())     completed += 15;
+if (profile.getExperienceYears() > 0)                                            completed += 10;
+if (profile.getHourlyRate()      > 0)                                            completed += 10;
+if (profile.getBio()       != null && !profile.getBio().trim().isEmpty())        completed += 10;
 
-if(profile.getPhone()!=null && !profile.getPhone().trim().isEmpty()) completed += 10;
-if(profile.getTitle()!=null && !profile.getTitle().trim().isEmpty()) completed += 15;
-if(profile.getSkills()!=null && !profile.getSkills().trim().isEmpty()) completed += 15;
-if(profile.getExperienceYears()>0) completed += 10;
-if(profile.getHourlyRate()>0) completed += 10;
-if(profile.getBio()!=null && !profile.getBio().trim().isEmpty()) completed += 10;
+boolean profileComplete = (completed == 100);
 
-boolean profileComplete = completed == 100;
+List<Job> activeJobs  = (List<Job>) request.getAttribute("activeJobs");
+List<Job> workingJobs = (List<Job>) request.getAttribute("workingJobs");
+int activeCount  = (activeJobs  != null) ? activeJobs.size()  : 0;
+int workingCount = (workingJobs != null) ? workingJobs.size() : 0;
 %>
-
 <!DOCTYPE html>
-
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Freelancer Dashboard | WorkPort</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 <style>
-
-/* YOUR ENTIRE CSS IS UNCHANGED */
-
 :root{
---primary-blue:#2563eb;
---border-light:#e2e8f0;
---text-dark:#1e293b;
---text-muted:#64748b;
---nav-bg:#f8fafc;
+  --blue:#2563eb;--blue2:#1d4ed8;--blue3:#3b82f6;
+  --bluelt:#eff6ff;--blue1:#dbeafe;
+  --cyan:#06b6d4;--violet:#8b5cf6;--emerald:#10b981;
+  --dark:#0c1a3a;--hero:#1e2d45;
+  --g50:#f9fafb;--g100:#f3f4f6;--g200:#e5e7eb;
+  --g400:#9ca3af;--g600:#4b5563;--g800:#1f2937;
+  --ok:#10b981;--err:#ef4444;--warn:#f59e0b;
+  --navh:64px;
+  --r:14px;--rs:9px;--rl:18px;
+  --s1:0 2px 8px rgba(0,0,0,.07);
+  --s2:0 10px 32px rgba(37,99,235,.13),0 2px 8px rgba(0,0,0,.06);
+  --s3:0 20px 48px rgba(37,99,235,.17),0 4px 16px rgba(0,0,0,.08);
 }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:#f1f5f9;color:var(--g800);overflow-x:hidden;}
+h1,h2,h3,h4{font-family:'Plus Jakarta Sans',sans-serif;}
+a{text-decoration:none;color:inherit;}
+button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 
-body{
-margin:0;
-font-family:'Inter',sans-serif;
-background:#ffffff;
-color:var(--text-dark);
+/* REVEAL */
+.rv{opacity:0;transform:translateY(20px);transition:opacity .55s cubic-bezier(.22,1,.36,1),transform .55s cubic-bezier(.22,1,.36,1);}
+.rv.on{opacity:1;transform:none;}
+.d1{transition-delay:.07s;}.d2{transition-delay:.14s;}.d3{transition-delay:.21s;}.d4{transition-delay:.28s;}
+
+/* ══ NAVBAR ══ */
+.nav{
+  position:fixed;top:0;left:0;right:0;height:var(--navh);z-index:900;
+  display:flex;align-items:center;padding:0 2.5%;gap:8px;
+  background:rgba(255,255,255,.93);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--g200);transition:box-shadow .3s;
 }
+.nav.sc{box-shadow:0 2px 12px rgba(0,0,0,.08);}
+.logo{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.logo-svg{width:34px;height:34px;display:block;}
+.logo-txt{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.4rem;font-weight:800;letter-spacing:-.3px;}
+.logo-txt .w{color:var(--g800);}.logo-txt .p{color:var(--blue);}
 
-/* NAVBAR */
+.nlinks{display:flex;align-items:center;gap:6px;margin-left:24px;}
+.ni{position:relative;}
+.nl{display:flex;align-items:center;gap:5px;padding:8px 14px;font-size:15px;font-weight:700;color:var(--g600);border-radius:var(--rs);transition:all .18s;cursor:pointer;white-space:nowrap;}
+.nl:hover{color:var(--blue);background:var(--bluelt);}
+.ca{font-size:10px;transition:transform .18s;}
+.ni:hover .ca{transform:rotate(180deg);}
+.dd{position:absolute;top:calc(100% + 8px);left:0;background:#fff;border:1px solid var(--g200);border-radius:var(--r);box-shadow:var(--s2);padding:6px;min-width:195px;opacity:0;visibility:hidden;transform:translateY(-5px);transition:all .2s cubic-bezier(.22,1,.36,1);z-index:200;}
+.ni:hover .dd{opacity:1;visibility:visible;transform:none;}
+.dd a{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:var(--rs);font-size:13px;font-weight:600;color:var(--g600);transition:all .16s;}
+.dd a i{font-size:14px;color:var(--blue3);}
+.dd a:hover{background:var(--bluelt);color:var(--blue);padding-left:16px;}
 
-.navbar{
-display:flex;
-align-items:center;
-padding:0 5%;
-background:var(--nav-bg);
-border-bottom:1px solid var(--border-light);
-height:75px;
+.nr{display:flex;align-items:center;gap:10px;margin-left:auto;}
+.nibtn{width:38px;height:38px;border-radius:9px;border:1.5px solid var(--g200);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--g600);font-size:16px;position:relative;transition:all .18s;}
+.nibtn:hover{border-color:var(--blue3);color:var(--blue);background:var(--bluelt);transform:translateY(-1px);}
+.nbadge{position:absolute;top:5px;right:5px;width:7px;height:7px;background:var(--err);border-radius:50%;border:1.5px solid #fff;}
+.nprof{display:flex;align-items:center;gap:8px;padding:4px 8px;border-radius:8px;transition:background .18s;}
+.nprof:hover{background:var(--g100);}
+.navtr{width:32px;height:32px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--emerald),var(--cyan));color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;}
+.nname{font-size:13px;font-weight:700;color:var(--g800);}
+.nrole{font-size:10px;font-weight:700;color:var(--emerald);background:#f0fdf4;padding:1px 6px;border-radius:5px;text-transform:uppercase;letter-spacing:.3px;display:block;}
+.nbtn{display:flex;align-items:center;gap:5px;padding:7px 14px;background:transparent;border:1.5px solid var(--g200);border-radius:var(--rs);font-size:13px;font-weight:700;color:var(--g600);transition:all .18s;}
+.nbtn:hover{border-color:var(--err);color:var(--err);background:#fff5f5;}
+
+/* ══ HERO ══ */
+.hero{
+  margin-top:var(--navh);
+  position:relative;
+  height:460px;
+  overflow:hidden;
+  background:#0f2137;
 }
-
-.logo{
-font-size:1.7rem;
-font-weight:800;
-text-decoration:none;
-margin-right:35px;
+.hero-bg-shape{
+  position:absolute;top:0;right:0;
+  width:52%;height:100%;
+  background:linear-gradient(135deg,#f0fdf4 0%,#dcfce7 40%,#d1fae5 100%);
+  clip-path:polygon(12% 0,100% 0,100% 100%,0% 100%);
+  z-index:0;
 }
-
-.logo .work{color:#000;}
-.logo .port{color:var(--primary-blue);}
-
-.nav-links{
-display:flex;
-gap:8px;
-height:100%;
-align-items:center;
+.hl{
+  position:absolute;top:0;left:0;
+  width:52%;height:100%;
+  z-index:2;padding:50px 3% 50px 3%;
+  display:flex;flex-direction:column;justify-content:center;
 }
-
-.nav-item{
-position:relative;
-height:100%;
-display:flex;
-align-items:center;
+.hl::before{content:'';position:absolute;inset:0;pointer-events:none;z-index:0;background-image:radial-gradient(rgba(255,255,255,.04) 1px,transparent 1px);background-size:26px 26px;}
+.hl>*{position:relative;z-index:1;}
+.hr{
+  position:absolute;right:0;top:0;
+  width:50%;height:100%;
+  z-index:1;overflow:hidden;
 }
-
-.nav-link{
-text-decoration:none;
-color:var(--text-dark);
-font-size:14px;
-font-weight:500;
-padding:0 12px;
-display:flex;
-align-items:center;
-height:100%;
-cursor:pointer;
+.hr img{
+  position:absolute;bottom:0;right:4%;
+  height:105%;width:auto;
+  object-fit:contain;object-position:bottom center;
+  filter:drop-shadow(-8px 0 24px rgba(15,33,55,.22));
 }
-
-.dropdown-content{
-display:none;
-position:absolute;
-top:75px;
-left:0;
-background:#fff;
-min-width:220px;
-box-shadow:0 12px 24px rgba(0,0,0,0.1);
-border:1px solid var(--border-light);
-border-radius:0 0 10px 10px;
-padding:12px 0;
+.client-badge{
+  position:absolute;bottom:22px;right:calc(4% + 10px);
+  background:rgba(255,255,255,.95);backdrop-filter:blur(8px);
+  border-radius:10px;padding:8px 14px;
+  display:flex;align-items:center;gap:8px;
+  box-shadow:0 4px 20px rgba(0,0,0,.12);z-index:3;
 }
+.cb-earned{font-size:13px;font-weight:800;color:var(--g800);}
+.cb-label{font-size:11px;color:var(--g400);}
+.cb-dot{width:8px;height:8px;background:var(--ok);border-radius:50%;animation:pu 2s infinite;flex-shrink:0;}
 
-.nav-item:hover .dropdown-content{
-display:block;
+.hwelcome{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:10px;}
+.wd{width:6px;height:6px;background:var(--emerald);border-radius:50%;animation:pu 2s infinite;flex-shrink:0;}
+.hwelcome strong{color:#fff;}
+@keyframes pu{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.5)}}
+.hl h1{font-size:clamp(1.9rem,3.2vw,2.8rem);font-weight:800;color:#fff;line-height:1.12;letter-spacing:-.7px;margin-bottom:12px;}
+.hl h1 .ac{background:linear-gradient(90deg,#34d399,#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hsub{font-size:14px;color:rgba(255,255,255,.55);line-height:1.72;max-width:420px;margin-bottom:22px;}
+.hsr{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+.hsbox{position:relative;flex:1;min-width:200px;max-width:320px;}
+.hsbox i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:rgba(255,255,255,.4);font-size:15px;pointer-events:none;}
+.hsbox input{width:100%;padding:11px 12px 11px 38px;background:rgba(255,255,255,.10);border:1.5px solid rgba(255,255,255,.18);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;color:#fff;outline:none;backdrop-filter:blur(6px);transition:all .2s;}
+.hsbox input::placeholder{color:rgba(255,255,255,.38);}
+.hsbox input:focus{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.34);box-shadow:0 0 0 3px rgba(52,211,153,.18);}
+.btnp{display:inline-flex;align-items:center;gap:7px;padding:11px 18px;background:var(--emerald);color:#fff;border-radius:10px;font-size:13.5px;font-weight:800;border:none;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 4px 14px rgba(16,185,129,.45);transition:all .22s;white-space:nowrap;}
+.btnp:hover{background:#059669;transform:translateY(-2px);box-shadow:0 8px 22px rgba(16,185,129,.55);color:#fff;}
+.btnp.dis{background:#475569;box-shadow:none;}.btnp.dis:hover{transform:none;box-shadow:none;}
+.btng{display:inline-flex;align-items:center;gap:7px;padding:10px 17px;background:rgba(255,255,255,.1);color:#fff;border-radius:10px;font-size:13.5px;font-weight:700;border:1.5px solid rgba(255,255,255,.2);font-family:'DM Sans',sans-serif;backdrop-filter:blur(6px);transition:all .22s;}
+.btng:hover{background:rgba(255,255,255,.2);transform:translateY(-2px);color:#fff;}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:18px;}
+.chip{padding:4px 10px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:20px;font-size:12px;font-weight:600;color:rgba(255,255,255,.6);cursor:pointer;transition:all .18s;}
+.chip:hover{background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.3);}
+
+/* ══ SKILLS SHOWCASE SECTION ══ */
+.skills-sec{
+  background:#f1f5f9;
+  padding:36px 2.5%;
+  border-bottom:1.5px solid var(--g200);
 }
-
-.dropdown-content a{
-display:block;
-padding:12px 24px;
-text-decoration:none;
-color:var(--text-dark);
+.skills-sec-title{
+  font-family:'Plus Jakarta Sans',sans-serif;
+  font-size:1.15rem;font-weight:700;color:var(--g800);
+  margin-bottom:20px;padding-left:80px;
 }
-
-.dropdown-content a:hover{
-background:#f8fafc;
-color:var(--primary-blue);
+.skills-grid{
+  display:flex;gap:16px;flex-wrap:wrap;
+  justify-content:center;padding-bottom:6px;
 }
-
-/* SEARCH */
-
-.search-container{
-flex-grow:1;
-max-width:400px;
-margin:0 30px;
-position:relative;
+.skill-card{
+  flex:0 0 170px;border-radius:14px;overflow:hidden;
+  cursor:pointer;position:relative;height:148px;
+  transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s;
+  border:1.5px solid var(--g200);
 }
-
-.search-input{
-width:100%;
-padding:10px 15px 10px 40px;
-border-radius:25px;
-border:1px solid var(--border-light);
-font-size:14px;
+.skill-card:hover{transform:translateY(-5px);box-shadow:0 14px 36px rgba(16,185,129,.18);}
+.skill-card-bg{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s cubic-bezier(.22,1,.36,1);}
+.skill-card:hover .skill-card-bg{transform:scale(1.07);}
+.skill-card-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.08) 0%,rgba(0,0,0,.65) 100%);
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:14px 13px;
 }
+.skill-card-sub{font-size:10px;font-weight:700;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px;}
+.skill-card-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:800;color:#fff;line-height:1.2;}
 
-.search-icon{
-position:absolute;
-left:15px;
-top:50%;
-transform:translateY(-50%);
-color:var(--text-muted);
+/* ══ PAGE CONTENT ══ */
+.pw{padding:24px 2.5% 52px;width:100%;}
+
+/* incomplete banner */
+.ib{display:flex;align-items:center;gap:13px;padding:15px 18px;background:linear-gradient(135deg,#fffbeb,#fef3c7);border:1px solid #fde68a;border-radius:var(--r);margin-bottom:22px;transition:box-shadow .25s;}
+.ib:hover{box-shadow:0 4px 16px rgba(245,158,11,.16);}
+.ib i{font-size:18px;color:var(--warn);flex-shrink:0;}
+.ib strong{font-size:13.5px;color:#92400e;display:block;}
+.ib p{font-size:12.5px;color:#b45309;margin-top:1px;}
+.ibr{display:flex;flex-direction:column;align-items:flex-end;gap:4px;margin-left:auto;flex-shrink:0;}
+.ibr span{font-size:11.5px;font-weight:700;color:#92400e;}
+.pb{width:96px;height:5px;background:#fde68a;border-radius:99px;overflow:hidden;}
+.pf{height:100%;background:var(--warn);border-radius:99px;}
+.bcomp{display:inline-flex;align-items:center;gap:4px;padding:7px 12px;background:#f0fdf4;color:var(--ok);border:1.5px solid #bbf7d0;border-radius:var(--rs);font-size:12.5px;font-weight:700;margin-left:9px;flex-shrink:0;transition:all .2s;}
+.bcomp:hover{background:var(--ok);color:#fff;border-color:var(--ok);}
+
+/* section header */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.sht{font-size:1.05rem;font-weight:700;color:var(--g800);display:flex;align-items:center;gap:8px;}
+.shi{width:30px;height:30px;border-radius:8px;background:var(--bluelt);display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:14px;flex-shrink:0;}
+.shi.g{background:#f0fdf4;color:var(--ok);}
+.shb{font-size:11px;font-weight:700;background:var(--bluelt);color:var(--blue);padding:3px 10px;border-radius:20px;}
+.shb.g{background:#dcfce7;color:#15803d;}
+
+/* ══ HORIZONTAL CARD ROW ══ */
+.card-scroll-wrap{position:relative;padding:0 10px;}
+.card-row{display:flex;gap:18px;overflow-x:auto;padding-bottom:10px;padding-top:4px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;}
+.card-row::-webkit-scrollbar{height:0;}
+.card-row{scrollbar-width:none;}
+.row-arr{position:absolute;top:50%;transform:translateY(-60%);width:36px;height:36px;background:#fff;border:1.5px solid var(--g200);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;font-size:14px;color:var(--g600);box-shadow:var(--s1);transition:all .22s;}
+.row-arr:hover{border-color:var(--blue);color:var(--blue);box-shadow:var(--s2);transform:translateY(-60%) scale(1.08);}
+.row-arr-l{left:-6px;}.row-arr-r{right:-6px;}
+
+/* ══ JOB CARD ══ */
+.jcard{
+  background:#fff;border:1.5px solid var(--g200);border-radius:16px;padding:24px;flex:0 0 360px;min-width:0;
+  display:flex;flex-direction:column;gap:14px;
+  transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s cubic-bezier(.22,1,.36,1),border-color .25s;
+  position:relative;will-change:transform;
 }
+.jcard:hover{transform:translateY(-6px);box-shadow:0 12px 36px rgba(37,99,235,.14),0 2px 8px rgba(0,0,0,.06);border-color:#93c5fd;}
+.jcard.wk{border-top:3px solid var(--ok);}
+.jcard-top{display:flex;align-items:flex-start;gap:12px;}
+.jcard-ico{width:42px;height:42px;border-radius:50%;background:var(--g100);border:2px solid var(--g200);display:flex;align-items:center;justify-content:center;color:var(--g400);font-size:18px;flex-shrink:0;transition:all .25s;}
+.jcard:hover .jcard-ico{background:var(--bluelt);border-color:var(--blue1);color:var(--blue);}
+.jcard.wk .jcard-ico{background:#f0fdf4;border-color:#bbf7d0;color:#15803d;}
+.jcard-title-wrap{flex:1;min-width:0;}
+.jcard-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:1rem;font-weight:700;color:var(--g800);line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;transition:color .2s;}
+.jcard:hover .jcard-name{color:var(--blue);}
+.jcard-status-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:5px;}
+.badge-blue{background:var(--bluelt);color:var(--blue);}
+.badge-green{background:#dcfce7;color:#15803d;}
+.badge-blue::before,.badge-green::before{content:'';width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+.badge-blue::before{background:var(--blue3);}
+.badge-green::before{background:var(--ok);animation:pu 2s infinite;}
+.jcard-menu{width:30px;height:30px;border-radius:8px;background:transparent;border:none;display:flex;align-items:center;justify-content:center;color:var(--g400);font-size:20px;cursor:pointer;transition:all .18s;flex-shrink:0;letter-spacing:-.5px;}
+.jcard-menu:hover{background:var(--g100);color:var(--g600);}
+.jcard-meta{display:flex;flex-wrap:wrap;gap:10px;font-size:13px;color:var(--g600);}
+.jcard-meta span{display:flex;align-items:center;gap:5px;background:var(--g50);padding:4px 10px;border-radius:20px;border:1px solid var(--g200);}
+.jcard-meta i{font-size:13px;color:var(--blue3);}
+.jcard-desc{font-size:13px;color:var(--g600);line-height:1.6;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;flex:1;}
+.jcard-actions{display:flex;gap:8px;margin-top:auto;padding-top:14px;border-top:1px solid var(--g100);}
+.bv,.ba,.bc,.bch{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 14px;border-radius:var(--rs);font-size:13px;font-weight:700;font-family:'DM Sans',sans-serif;border:1.5px solid;transition:transform .2s,box-shadow .2s,background .2s,color .2s,border-color .2s;flex:1;white-space:nowrap;will-change:transform;cursor:pointer;}
+.bv{background:var(--bluelt);color:var(--blue);border-color:var(--blue1);}
+.bv:hover{background:var(--blue);color:#fff;border-color:var(--blue);transform:translateY(-2px);box-shadow:0 6px 14px rgba(37,99,235,.3);}
+.ba{background:#f0fdf4;color:#15803d;border-color:#bbf7d0;}
+.ba:hover{background:var(--ok);color:#fff;border-color:var(--ok);transform:translateY(-2px);box-shadow:0 6px 14px rgba(16,185,129,.25);}
+.bc{background:#fff;color:var(--blue);border-color:var(--blue1);}
+.bc:hover{background:var(--blue);color:#fff;border-color:var(--blue);transform:translateY(-2px);box-shadow:0 6px 14px rgba(37,99,235,.3);}
+.bch{background:#f0fdf4;color:#15803d;border-color:#bbf7d0;}
+.bch:hover{background:var(--ok);color:#fff;border-color:var(--ok);transform:translateY(-2px);box-shadow:0 6px 14px rgba(16,185,129,.25);}
 
-/* RIGHT SIDE */
+/* Browse more card */
+.browse-card{background:#fff;border:2px dashed var(--g200);border-radius:16px;padding:24px;flex:0 0 240px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;cursor:pointer;transition:all .25s cubic-bezier(.22,1,.36,1);text-align:center;text-decoration:none;}
+.browse-card:hover{border-color:var(--blue);background:var(--bluelt);transform:translateY(-6px);box-shadow:0 12px 32px rgba(37,99,235,.12);}
+.browse-card i{font-size:28px;color:var(--blue);transition:transform .25s;}
+.browse-card:hover i{transform:scale(1.15) rotate(8deg);}
+.browse-card span{font-size:14px;font-weight:700;color:var(--blue);}
 
-.nav-right{
-margin-left:auto;
-display:flex;
-align-items:center;
-gap:20px;
+/* empty */
+.empty{text-align:center;padding:44px 20px;background:#fff;border:2px dashed var(--g200);border-radius:var(--r);transition:all .25s;width:100%;}
+.empty:hover{border-color:#93c5fd;background:var(--bluelt);}
+.ei{width:50px;height:50px;background:var(--g200);border-radius:12px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;font-size:22px;color:var(--g400);transition:all .25s;}
+.empty:hover .ei{background:var(--blue1);color:var(--blue3);}
+.empty h4{font-size:14px;font-weight:700;color:var(--g600);margin-bottom:4px;}
+.empty p{font-size:12.5px;color:var(--g400);}
+
+.div{border:0;border-top:1.5px solid var(--g100);margin:26px 0;}
+
+/* resource cards */
+.rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;}
+.rc{background:#fff;border:1.5px solid var(--g200);border-radius:16px;padding:24px;cursor:pointer;position:relative;overflow:hidden;transition:transform .25s cubic-bezier(.22,1,.36,1),box-shadow .25s,border-color .25s;will-change:transform;}
+.rc::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--emerald),var(--cyan));transform:scaleX(0);transform-origin:left;transition:transform .3s cubic-bezier(.22,1,.36,1);}
+.rc:hover{border-color:#6ee7b7;box-shadow:0 12px 36px rgba(16,185,129,.13),0 2px 8px rgba(0,0,0,.05);transform:translateY(-6px);}
+.rc:hover::after{transform:scaleX(1);}
+.ri{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;transition:transform .25s;}
+.rc:hover .ri{transform:scale(1.12) rotate(-5deg);}
+.rig{background:#f0fdf4;color:var(--ok);}
+.ric{background:#ecfeff;color:var(--cyan);}
+.riv{background:#f5f3ff;color:var(--violet);}
+.rib{background:var(--bluelt);color:var(--blue);}
+.ra{position:absolute;top:18px;right:18px;font-size:15px;color:var(--g400);transition:all .22s;}
+.rc:hover .ra{color:var(--ok);transform:translate(3px,-3px);}
+.rc h3{font-size:15px;font-weight:700;margin-bottom:7px;color:var(--g800);transition:color .2s;}
+.rc:hover h3{color:var(--ok);}
+.rc p{font-size:13px;color:var(--g400);line-height:1.6;}
+
+/* modal */
+.mo{display:none;position:fixed;inset:0;background:rgba(15,23,42,.52);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(5px);}
+.mo.open{display:flex;}
+.mb{background:#fff;width:92%;max-width:530px;border-radius:var(--rl);padding:28px;position:relative;box-shadow:var(--s3);animation:mp .28s cubic-bezier(.22,1,.36,1);}
+@keyframes mp{from{transform:scale(.92) translateY(12px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+.mc{position:absolute;top:12px;right:12px;width:27px;height:27px;background:var(--g100);border:none;border-radius:7px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--g600);font-size:14px;transition:all .18s;}
+.mc:hover{background:var(--g200);transform:rotate(90deg);}
+.mtp{padding-bottom:12px;border-bottom:1.5px solid var(--g100);margin-bottom:14px;}
+.mtt{font-size:1.05rem;font-weight:800;color:var(--g800);margin-bottom:3px;}
+.mts{font-size:12px;color:var(--g400);}
+.dr{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--g100);align-items:flex-start;}
+.dr:last-child{border-bottom:0;padding-bottom:0;}
+.di{width:27px;height:27px;background:var(--bluelt);border-radius:7px;display:flex;align-items:center;justify-content:center;color:var(--blue3);font-size:13px;flex-shrink:0;}
+.dl{font-size:10px;font-weight:700;color:var(--g400);text-transform:uppercase;letter-spacing:.5px;}
+.dv{font-size:13px;font-weight:600;color:var(--g800);margin-top:2px;}
+.dd2{font-size:13px;color:var(--g600);line-height:1.72;margin-top:7px;padding-left:37px;}
+
+/* apply modal form */
+.apply-form label{display:block;font-size:12px;font-weight:700;color:var(--g600);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.apply-form textarea{width:100%;height:120px;padding:12px;border:1.5px solid var(--g200);border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:13.5px;color:var(--g800);resize:vertical;outline:none;transition:border-color .2s,box-shadow .2s;}
+.apply-form textarea:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,.12);}
+.apply-form .submit-btn{margin-top:14px;width:100%;padding:12px;background:var(--emerald);color:#fff;border:none;border-radius:var(--rs);font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:7px;}
+.apply-form .submit-btn:hover{background:#059669;transform:translateY(-1px);box-shadow:0 6px 14px rgba(16,185,129,.35);}
+
+/* footer */
+.ft{background:var(--dark);padding:44px 2.5% 22px;}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:30px;}
+.fb{font-family:'Plus Jakarta Sans',sans-serif;font-size:1.35rem;font-weight:800;margin-bottom:8px;display:flex;align-items:center;gap:7px;}
+.fb .w{color:#fff;}.fb .p{color:#60a5fa;}
+.ftag{font-size:13px;color:#fff;line-height:1.7;max-width:250px;}
+.fct{font-size:10px;font-weight:800;color:#fff;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;}
+.fl a{display:block;color:#fff;font-size:13px;margin-bottom:8px;transition:color .18s,padding .18s;}
+.fl a:hover{color:#60a5fa;padding-left:4px;}
+.fbot{border-top:1px solid rgba(255,255,255,.06);padding-top:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.fbot p{font-size:12px;color:#fff;}
+.fs{display:flex;gap:6px;}
+.fs a{width:28px;height:28px;background:rgba(255,255,255,.05);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;border:1px solid rgba(255,255,255,.08);transition:all .18s;}
+.fs a:hover{background:var(--blue);color:#fff;transform:translateY(-2px);}
+
+@media(max-width:860px){
+  .nlinks{display:none;}
+  .hero{height:auto;min-height:420px;}
+  .hl{position:relative;width:100%;padding:40px 5% 200px;}
+  .hero-bg-shape{display:none;}
+  .hr{position:absolute;bottom:0;right:0;width:55%;height:220px;}
+  .hr img{height:220px;right:0;}
+  .client-badge{right:8px;bottom:8px;}
+  .fg{grid-template-columns:1fr;gap:20px;}
+  .jcard{flex:0 0 290px;}
 }
-
-.profile-box{
-display:flex;
-align-items:center;
-gap:12px;
-text-decoration:none;
+@media(max-width:560px){
+  .hl h1{font-size:1.85rem;}
+  .hsr{flex-direction:column;align-items:stretch;}
+  .hsbox{max-width:100%;}
+  .hr{width:60%;}
 }
-
-.user-name-small{
-font-weight:700;
-font-size:14px;
-margin:0;
-color:var(--text-dark);
-}
-
-.user-role-badge{
-background:#eff6ff;
-color:var(--primary-blue);
-font-size:10px;
-font-weight:700;
-padding:2px 8px;
-border-radius:6px;
-text-transform:uppercase;
-}
-
-.logout-btn{
-border:1.5px solid var(--primary-blue);
-color:var(--primary-blue);
-background:transparent;
-padding:7px 16px;
-border-radius:8px;
-font-weight:600;
-cursor:pointer;
-}
-
-.logout-btn:hover{
-background:var(--primary-blue);
-color:white;
-}
-
-/* DASHBOARD CONTENT */
-
-.container{
-width:90%;
-max-width:1000px;
-margin:40px auto;
-}
-
-.card{
-background:white;
-padding:25px;
-margin-bottom:20px;
-border-radius:10px;
-border:1px solid var(--border-light);
-}
-
-.card h3{
-margin-top:0;
-}
-
-.btn{
-background:var(--primary-blue);
-color:white;
-padding:10px 18px;
-border-radius:6px;
-border:none;
-cursor:pointer;
-font-size:14px;
-}
-
-.warning{
-background:#fffbeb;
-border:1px solid #fde68a;
-padding:20px;
-border-radius:10px;
-margin-bottom:25px;
-color:#92400e;
-}
-
-.job-card{
-background:#ffffff;
-border:1px solid var(--border-light);
-border-radius:10px;
-padding:20px;
-margin-bottom:15px;
-}
-
-.job-card h4{
-margin:0 0 10px 0;
-}
-
-/* MODAL */
-
-.modal{
-display:none;
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.6);
-justify-content:center;
-align-items:center;
-z-index:999;
-}
-
-.modal-content{
-background:white;
-width:600px;
-max-height:80%;
-overflow:auto;
-padding:25px;
-border-radius:10px;
-position:relative;
-}
-
-.close-btn{
-position:absolute;
-right:15px;
-top:10px;
-font-size:20px;
-border:none;
-background:none;
-cursor:pointer;
-}
-
 </style>
-
 </head>
-
 <body>
 
-<!-- NAVBAR (UNCHANGED) -->
+<!-- ══ NAVBAR ══ -->
+<nav class="nav" id="nav">
+  <a href="FreelancerHomeServlet" class="logo">
+    <svg class="logo-svg" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="34" height="34" rx="9" fill="#2563eb"/>
+      <path d="M6 11.5L10 23L14 15.5L18 23L22 11.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <circle cx="27" cy="13" r="3" fill="#06b6d4"/>
+      <line x1="24" y1="19.5" x2="30" y2="19.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      <line x1="23" y1="24" x2="31" y2="24" stroke="rgba(255,255,255,.4)" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <span class="logo-txt"><span class="w">Work</span><span class="p">Port</span></span>
+  </a>
 
-<nav class="navbar">
+  <div class="nlinks">
+    <div class="ni">
+      <span class="nl">Find Work <span class="ca">&#9660;</span></span>
+      <div class="dd">
+        <a href="BrowseJobsServlet"><i class="bi bi-search"></i> Browse Jobs</a>
+        <a href="AppliedJobServlet"><i class="bi bi-file-earmark-check"></i> My Applications</a>
+      </div>
+    </div>
+    <div class="ni">
+      <span class="nl">Deliver Work <span class="ca">&#9660;</span></span>
+      <div class="dd">
+        <a href="#"><i class="bi bi-person-workspace"></i> My Projects</a>
+        <a href="ChatServlet"><i class="bi bi-chat-dots"></i> Messages</a>
+      </div>
+    </div>
+    <div class="ni">
+      <span class="nl">Finances <span class="ca">&#9660;</span></span>
+      <div class="dd">
+        <a href="FreelancerWalletServlet"><i class="bi bi-wallet2"></i> My Earnings</a>
+      </div>
+    </div>
+  </div>
 
-<a href="FreelancerHomeServlet" class="logo">
-<span class="work">Work</span><span class="port">Port</span>
-</a>
-
-<div class="nav-links">
-
-<div class="nav-item">
-<a class="nav-link">Find Work ▼</a>
-<div class="dropdown-content">
-<a href="BrowseJobsServlet">Find Jobs</a>
-<a href="AppliedJobServlet">My Applications</a>
-</div>
-</div>
-
-<div class="nav-item">
-<a class="nav-link">Deliver Work ▼</a>
-<div class="dropdown-content">
-<a href="#">My Projects</a>
-</div>
-</div>
-
-<div class="nav-item">
-<a class="nav-link">Manage Finances ▼</a>
-<div class="dropdown-content">
-<a href="WalletServlet">My Earnings</a>
-</div>
-</div>
-
-<a href="#" class="nav-link">Messages</a>
-
-</div>
-
-<div class="search-container">
-<span class="search-icon">🔍</span>
-<input type="text" class="search-input" placeholder="Search for jobs...">
-</div>
-<a href="FreelancerNotificationServlet">Notifications</a>
-<a href="ChatServlet" class="nav-link">Messages</a>
-
-<div class="nav-right">
-
-<a href="FreelancerWalletServlet" class="nav-link">💰 Wallet</a>
-
-<a href="FreelancerProfileServlet" class="profile-box">
-
-<div style="text-align:right">
-<p class="user-name-small"><%= profile.getName() %></p>
-<span class="user-role-badge">Freelancer</span>
-</div>
-
-<div style="width:40px;height:40px;border-radius:50%;background:var(--primary-blue);color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;">
-<%= profile.getName().substring(0,1).toUpperCase() %>
-</div>
-
-</a>
-
-<form action="LogoutServlet" method="post" style="margin:0">
-<button type="submit" class="logout-btn">Logout</button>
-</form>
-
-</div>
-
+  <div class="nr">
+    <a href="FreelancerNotificationServlet" class="nibtn"><i class="bi bi-bell"></i><span class="nbadge"></span></a>
+    <a href="ChatServlet" class="nibtn"><i class="bi bi-chat-dots"></i></a>
+    <a href="FreelancerWalletServlet" class="nibtn"><i class="bi bi-wallet2"></i></a>
+    <a href="FreelancerProfileServlet" class="nprof">
+      <div class="navtr"><%= profile.getName().substring(0,1).toUpperCase() %></div>
+      <div>
+        <div class="nname"><%= profile.getName() %></div>
+        <span class="nrole">Freelancer</span>
+      </div>
+    </a>
+    <form action="LogoutServlet" method="post" style="margin:0">
+      <button type="submit" class="nbtn"><i class="bi bi-box-arrow-right"></i> Logout</button>
+    </form>
+  </div>
 </nav>
 
-<div class="container">
+<!-- ══ HERO ══ -->
+<section class="hero">
+  <div class="hero-bg-shape"></div>
 
-<% if(!profileComplete){ %>
+  <!-- Left: content -->
+  <div class="hl">
+    <div class="hwelcome"><span class="wd"></span> Welcome back, <strong><%= profile.getName() %></strong></div>
+    <h1>Find Work &amp;<br><span class="ac">Grow Your Career</span></h1>
+    <p class="hsub">Discover projects that match your skills, build your portfolio, and get paid securely — all in one place.</p>
+    <div class="hsr">
+      <div class="hsbox">
+        <i class="bi bi-search"></i>
+        <input type="text" placeholder="Search jobs by skill or keyword..." id="heroSearch">
+      </div>
+      <% if (profileComplete) { %>
+        <a href="BrowseJobsServlet" class="btnp"><i class="bi bi-lightning-charge-fill"></i> Browse Jobs</a>
+      <% } else { %>
+        <button class="btnp dis" onclick="alert('Complete your profile to start applying!')"><i class="bi bi-lock"></i> Browse Jobs</button>
+      <% } %>
+    </div>
+    <div class="chips">
+      <span class="chip">Web Development</span>
+      <span class="chip">UI/UX Design</span>
+      <span class="chip">Mobile Apps</span>
+      <span class="chip">SEO</span>
+      <span class="chip">Content Writing</span>
+    </div>
+    <div><a href="FreelancerProfileServlet" class="btng"><i class="bi bi-person-circle"></i> View My Profile</a></div>
+  </div>
 
-<div class="warning">
-<b>Profile incomplete (<%= completed %>%)</b> — Complete your profile to apply for jobs.
+  <!-- Right: image -->
+  <div class="hr">
+    <img
+      src="https://images.unsplash.com/photo-1549923746-c502d488b3ea?auto=format&fit=crop&w=600&q=85&sat=-10"
+      alt="Professional freelancer working"
+    >
+    <div class="client-badge">
+      <span class="cb-dot"></span>
+      <div>
+        <div class="cb-earned">₹1,20,000+</div>
+        <div class="cb-label">Earned this month on WorkPort</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TOP SKILL CATEGORIES ══ -->
+<section class="skills-sec">
+  <div class="skills-sec-title">Top In-Demand Skill Categories</div>
+  <div class="skills-grid">
+
+    <div class="skill-card">
+      <img class="skill-card-bg" src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=400&h=300&q=80" alt="Web Development">
+      <div class="skill-card-overlay">
+        <div class="skill-card-sub">High Demand</div>
+        <div class="skill-card-name">Web Development</div>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <img class="skill-card-bg" src="https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&w=400&h=300&q=80" alt="UI/UX Design">
+      <div class="skill-card-overlay">
+        <div class="skill-card-sub">Creative</div>
+        <div class="skill-card-name">UI/UX Design</div>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <img class="skill-card-bg" src="https://images.unsplash.com/photo-1526378800651-c32d170fe6f8?auto=format&fit=crop&w=400&h=300&q=80" alt="Mobile App">
+      <div class="skill-card-overlay">
+        <div class="skill-card-sub">Fast Growing</div>
+        <div class="skill-card-name">App Development</div>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <img class="skill-card-bg" src="https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=400&h=300&q=80" alt="Data Analytics">
+      <div class="skill-card-overlay">
+        <div class="skill-card-sub">Top Paying</div>
+        <div class="skill-card-name">Data Analytics</div>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <img class="skill-card-bg" src="https://images.unsplash.com/photo-1542744094-24638eff58bb?auto=format&fit=crop&w=400&h=300&q=80" alt="SEO">
+      <div class="skill-card-overlay">
+        <div class="skill-card-sub">Always Needed</div>
+        <div class="skill-card-name">SEO & Marketing</div>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <img class="skill-card-bg" src="https://images.unsplash.com/photo-1587440871875-191322ee64b0?auto=format&fit=crop&w=400&h=300&q=80" alt="Video Editing">
+      <div class="skill-card-overlay">
+        <div class="skill-card-sub">Trending</div>
+        <div class="skill-card-name">Video Editing</div>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <img class="skill-card-bg" src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?auto=format&fit=crop&w=400&h=300&q=80" alt="Content Writing">
+      <div class="skill-card-overlay">
+        <div class="skill-card-sub">Evergreen</div>
+        <div class="skill-card-name">Content Writing</div>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <img class="skill-card-bg" src="https://images.unsplash.com/photo-1611532736597-de2d4265fba3?auto=format&fit=crop&w=400&h=300&q=80" alt="Social Media">
+      <div class="skill-card-overlay">
+        <div class="skill-card-sub">High Volume</div>
+        <div class="skill-card-name">Social Media</div>
+      </div>
+    </div>
+
+    <div class="skill-card">
+      <img class="skill-card-bg" src="https://images.unsplash.com/photo-1467232004584-a241de8bcf5d?auto=format&fit=crop&w=400&h=300&q=80" alt="WordPress">
+      <div class="skill-card-overlay">
+        <div class="skill-card-sub">Popular</div>
+        <div class="skill-card-name">WordPress</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ PAGE CONTENT ══ -->
+<div class="pw">
+
+  <!-- Incomplete profile banner -->
+  <% if (!profileComplete) { %>
+  <div class="ib rv">
+    <i class="bi bi-exclamation-triangle-fill"></i>
+    <div>
+      <strong>Profile is <%= completed %>% complete</strong>
+      <p>Add phone, title, skills, experience &amp; bio to start applying for jobs.</p>
+    </div>
+    <div class="ibr">
+      <span><%= completed %>/100%</span>
+      <div class="pb"><div class="pf" style="width:<%= completed %>%"></div></div>
+    </div>
+    <a href="FreelancerProfileServlet" class="bcomp">Complete &rarr;</a>
+  </div>
+  <% } %>
+
+  <!-- ══ MY WORKING PROJECTS ══ -->
+  <div class="sh rv">
+    <div class="sht">
+      <div class="shi g"><i class="bi bi-person-workspace"></i></div>
+      My Working Projects
+    </div>
+    <span class="shb g"><%= workingCount %> project<%= workingCount != 1 ? "s" : "" %></span>
+  </div>
+
+  <div class="card-scroll-wrap rv">
+    <button class="row-arr row-arr-l" onclick="scrollRow('workingRow',-1)"><i class="bi bi-chevron-left"></i></button>
+    <div class="card-row" id="workingRow">
+
+      <% if (workingJobs == null || workingJobs.isEmpty()) { %>
+        <div class="empty">
+          <div class="ei"><i class="bi bi-person-workspace"></i></div>
+          <h4>No active projects yet</h4>
+          <p>Once a client hires you, your ongoing work appears here.</p>
+        </div>
+      <% } else {
+           for (Job job : workingJobs) { %>
+        <div class="jcard wk">
+          <div class="jcard-top">
+            <div class="jcard-ico"><i class="bi bi-person-workspace"></i></div>
+            <div class="jcard-title-wrap">
+              <div class="jcard-name"><%= job.getTitle() %></div>
+              <span class="jcard-status-badge badge-green">In Progress</span>
+            </div>
+            <button class="jcard-menu">&#8230;</button>
+          </div>
+          <div class="jcard-meta">
+            <span><i class="bi bi-currency-rupee"></i>&#8377;<%= job.getBudget() %></span>
+            <span><i class="bi bi-clock"></i><%= job.getDuration() %></span>
+            <% if (job.getFreelancerLevel() != null && !job.getFreelancerLevel().isEmpty()) { %>
+            <span><i class="bi bi-bar-chart"></i><%= job.getFreelancerLevel() %></span>
+            <% } %>
+          </div>
+          <div class="jcard-desc">
+            <%= (job.getDescription() != null && !job.getDescription().isEmpty()) ? job.getDescription() : "No description provided." %>
+          </div>
+          <div class="jcard-actions">
+            <a href="ChatServlet?jobId=<%= job.getJobId() %>" class="bch" style="text-decoration:none;">
+              <i class="bi bi-chat-dots-fill"></i> Open Chat
+            </a>
+            <button class="bv"
+              data-title="<%= (job.getTitle()!=null)?job.getTitle().replace("'","\\'"):"" %>"
+              data-budget="<%= job.getBudget() %>"
+              data-dur="<%= (job.getDuration()!=null)?job.getDuration():"" %>"
+              data-level="<%= (job.getFreelancerLevel()!=null)?job.getFreelancerLevel():"" %>"
+              data-comp="<%= (job.getComplexity()!=null)?job.getComplexity():"" %>"
+              data-desc="<%= (job.getDescription()!=null)?job.getDescription().replace("'","\\'"):"" %>"
+              onclick="openJM(this)">
+              <i class="bi bi-eye"></i> Details
+            </button>
+          </div>
+        </div>
+      <% } } %>
+
+    </div>
+    <button class="row-arr row-arr-r" onclick="scrollRow('workingRow',1)"><i class="bi bi-chevron-right"></i></button>
+  </div>
+
+  <hr class="div">
+
+  <!-- ══ AVAILABLE JOBS ══ -->
+  <div class="sh rv">
+    <div class="sht">
+      <div class="shi"><i class="bi bi-broadcast-pin"></i></div>
+      Available Jobs
+    </div>
+    <span class="shb"><%= activeCount %> listing<%= activeCount != 1 ? "s" : "" %></span>
+  </div>
+
+  <div class="card-scroll-wrap rv">
+    <button class="row-arr row-arr-l" onclick="scrollRow('activeRow',-1)"><i class="bi bi-chevron-left"></i></button>
+    <div class="card-row" id="activeRow">
+
+      <% if (activeJobs == null || activeJobs.isEmpty()) { %>
+        <div class="empty">
+          <div class="ei"><i class="bi bi-folder2-open"></i></div>
+          <h4>No jobs available right now</h4>
+          <p>Check back soon — new projects are posted daily.</p>
+        </div>
+      <% } else {
+           for (Job job : activeJobs) {
+             String jt  = (job.getTitle()       != null) ? job.getTitle().replace("'", "\\'")       : "";
+             String jd  = (job.getDuration()    != null) ? job.getDuration()                        : "";
+             String jl  = (job.getFreelancerLevel() != null) ? job.getFreelancerLevel()             : "";
+             String jc  = (job.getComplexity()  != null) ? job.getComplexity()                     : "";
+             String jde = (job.getDescription() != null) ? job.getDescription().replace("'", "\\'") : "";
+      %>
+        <div class="jcard">
+          <div class="jcard-top">
+            <div class="jcard-ico"><i class="bi bi-briefcase"></i></div>
+            <div class="jcard-title-wrap">
+              <div class="jcard-name"><%= job.getTitle() %></div>
+              <span class="jcard-status-badge badge-blue">Open</span>
+            </div>
+            <button class="jcard-menu">&#8230;</button>
+          </div>
+          <div class="jcard-meta">
+            <span><i class="bi bi-currency-rupee"></i>&#8377;<%= job.getBudget() %></span>
+            <span><i class="bi bi-clock"></i><%= job.getDuration() %></span>
+            <% if (job.getFreelancerLevel() != null && !job.getFreelancerLevel().isEmpty()) { %>
+            <span><i class="bi bi-bar-chart"></i><%= job.getFreelancerLevel() %></span>
+            <% } %>
+          </div>
+          <div class="jcard-desc">
+            <%= (job.getDescription() != null && !job.getDescription().isEmpty()) ? job.getDescription() : "No description provided." %>
+          </div>
+          <div class="jcard-actions">
+            <button class="bv"
+              data-title="<%= jt %>" data-budget="<%= job.getBudget() %>"
+              data-dur="<%= jd %>" data-level="<%= jl %>"
+              data-comp="<%= jc %>" data-desc="<%= jde %>"
+              onclick="openJM(this)">
+              <i class="bi bi-eye"></i> View
+            </button>
+            <% if (profileComplete) { %>
+            <button class="ba" onclick="openApplyModal('<%= job.getJobId() %>')">
+              <i class="bi bi-send-fill"></i> Apply
+            </button>
+            <% } else { %>
+            <button class="ba" onclick="alert('Complete your profile to apply for jobs!')" style="opacity:.6;cursor:not-allowed;">
+              <i class="bi bi-lock"></i> Apply
+            </button>
+            <% } %>
+          </div>
+        </div>
+      <% } } %>
+
+      <a href="BrowseJobsServlet" class="browse-card">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+        <span>Browse all jobs</span>
+      </a>
+
+    </div>
+    <button class="row-arr row-arr-r" onclick="scrollRow('activeRow',1)"><i class="bi bi-chevron-right"></i></button>
+  </div>
+
+  <hr class="div">
+
+  <!-- ══ FREELANCER RESOURCE CENTER ══ -->
+  <div class="sh rv">
+    <div class="sht">
+      <div class="shi" style="background:#f5f3ff;color:var(--violet);"><i class="bi bi-book-half"></i></div>
+      Freelancer Resource Center
+    </div>
+  </div>
+  <div class="rg">
+    <div class="rc rv d1" onclick="openRM('winMore')">
+      <i class="bi bi-arrow-up-right ra"></i>
+      <div class="ri rig"><i class="bi bi-trophy-fill"></i></div>
+      <h3>Win More Projects</h3>
+      <p>Tips on crafting standout proposals that get clients to respond and hire.</p>
+    </div>
+    <div class="rc rv d2" onclick="openRM('earnings')">
+      <i class="bi bi-arrow-up-right ra"></i>
+      <div class="ri ric"><i class="bi bi-wallet2"></i></div>
+      <h3>Manage Earnings</h3>
+      <p>How withdrawals, escrow, and milestone billing work on WorkPort.</p>
+    </div>
+    <div class="rc rv d3" onclick="openRM('profile')">
+      <i class="bi bi-arrow-up-right ra"></i>
+      <div class="ri riv"><i class="bi bi-person-badge-fill"></i></div>
+      <h3>Build Your Profile</h3>
+      <p>A strong profile gets you 3× more invites. Here's what clients look for.</p>
+    </div>
+  </div>
+
 </div>
-<% } %>
-<h2>My Working Projects</h2>
 
-<%
-List<Job> workingJobs = (List<Job>) request.getAttribute("workingJobs");
+<!-- ══ FOOTER ══ -->
+<footer class="ft">
+  <div class="fg">
+    <div>
+      <div class="fb">
+        <svg viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:26px;height:26px;flex-shrink:0;">
+          <rect width="34" height="34" rx="9" fill="#2563eb"/>
+          <path d="M6 11.5L10 23L14 15.5L18 23L22 11.5" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <circle cx="27" cy="13" r="3" fill="#06b6d4"/>
+          <line x1="24" y1="19.5" x2="30" y2="19.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <span class="w">Work</span><span class="p">Port</span>
+      </div>
+      <p class="ftag">Empowering freelancers to build meaningful careers — securely, flexibly, at scale.</p>
+    </div>
+    <div><div class="fct">Support</div><div class="fl"><a href="#">Help Center</a><a href="#">Safety &amp; Security</a><a href="#">Privacy Policy</a></div></div>
+    <div><div class="fct">Company</div><div class="fl"><a href="#">About Us</a><a href="#">Careers</a><a href="#">Blog</a></div></div>
+  </div>
+  <div class="fbot">
+    <p>&copy; 2025 WorkPort Technologies. All rights reserved. | Made by Prem Vikas Yadav</p>
+    <div class="fs">
+      <a href="#"><i class="bi bi-twitter-x"></i></a>
+      <a href="#"><i class="bi bi-linkedin"></i></a>
+      <a href="#"><i class="bi bi-github"></i></a>
+    </div>
+  </div>
+</footer>
 
-if(workingJobs != null && !workingJobs.isEmpty()){
-    for(Job job : workingJobs){
-%>
-
-<div class="job-card" style="border-left:5px solid green;">
-
-<h4><%= job.getTitle() %></h4>
-
-<p><b>Budget:</b> ₹<%= job.getBudget() %></p>
-<p><b>Duration:</b> <%= job.getDuration() %></p>
-<p><b>Level:</b> <%= job.getFreelancerLevel() %></p>
-
-<!-- ✅ CHAT -->
-<a class="btn"
-href="ChatServlet?jobId=<%=job.getJobId()%>">
-Open Project Chat
-</a>
-
-<!-- ✅ VIEW DETAILS (same modal reuse) -->
-<button class="btn"
-onclick="openModal(
-'<%= job.getJobId() %>',
-'<%= job.getTitle() != null ? job.getTitle().replace("'", "\\'") : "" %>',
-'<%= job.getBudget() %>',
-'<%= job.getDuration() != null ? job.getDuration() : "" %>',
-'<%= job.getFreelancerLevel() != null ? job.getFreelancerLevel() : "" %>',
-'<%= job.getComplexity() != null ? job.getComplexity() : "" %>',
-'<%= job.getDescription() != null ? job.getDescription().replace("'", "\\'") : "" %>'
-)">
-View Details
-</button>
-
-<!-- ❌ NO APPLY BUTTON HERE -->
-
+<!-- ══ JOB DETAIL MODAL ══ -->
+<div id="jmO" class="mo">
+  <div class="mb">
+    <button class="mc" onclick="closeJM()"><i class="bi bi-x"></i></button>
+    <div class="mtp">
+      <div class="mtt" id="jmT"></div>
+      <div class="mts">Project Overview</div>
+    </div>
+    <div class="dr"><div class="di"><i class="bi bi-currency-rupee"></i></div><div><div class="dl">Budget</div><div class="dv">&#8377;<span id="jmB"></span></div></div></div>
+    <div class="dr"><div class="di"><i class="bi bi-clock"></i></div><div><div class="dl">Duration</div><div class="dv" id="jmD"></div></div></div>
+    <div class="dr"><div class="di"><i class="bi bi-person-badge"></i></div><div><div class="dl">Freelancer Level</div><div class="dv" id="jmL"></div></div></div>
+    <div class="dr"><div class="di"><i class="bi bi-layers"></i></div><div><div class="dl">Complexity</div><div class="dv" id="jmC"></div></div></div>
+    <div class="dr" style="flex-direction:column;gap:0;">
+      <div style="display:flex;align-items:center;gap:9px;"><div class="di"><i class="bi bi-file-text"></i></div><div class="dl">Description</div></div>
+      <div class="dd2" id="jmDe"></div>
+    </div>
+  </div>
 </div>
 
-<%
-    }
-} else {
-%>
-
-<p>No active projects yet.</p>
-
-<%
-}
-%>
-
-<h2>Available Jobs</h2>
-
-<%
-List<Job> activeJobs = (List<Job>) request.getAttribute("activeJobs");
-
-if(activeJobs != null){
-for(Job job : activeJobs){
-%>
-
-<div class="job-card">
-
-<h4><%= job.getTitle() %></h4>
-
-<p><b>Budget:</b> ₹<%= job.getBudget() %></p>
-<p><b>Duration:</b> <%= job.getDuration() %></p>
-<p><b>Level:</b> <%= job.getFreelancerLevel() %></p>
-
-<button class="btn"
-onclick="openModal(
-'<%= job.getJobId() %>',
-'<%= job.getTitle().replace("'", "\'") %>',
-'<%= job.getBudget() %>',
-'<%= job.getDuration() %>',
-'<%= job.getFreelancerLevel() %>',
-'<%= job.getComplexity() %>',
-'<%= job.getDescription().replace("'", "\'") %>'
-)">
-View Details </button>
-<button class="btn"
-onclick="openApplyModal('<%= job.getJobId() %>')">
-Apply for Job </button>
-
+<!-- ══ APPLY MODAL ══ -->
+<div id="applyO" class="mo">
+  <div class="mb">
+    <button class="mc" onclick="closeApplyModal()"><i class="bi bi-x"></i></button>
+    <div class="mtp">
+      <div class="mtt">Apply for this Job</div>
+      <div class="mts">Write a proposal that stands out</div>
+    </div>
+    <form action="ApplyJobServlet" method="post" class="apply-form">
+      <input type="hidden" name="jobId" id="applyJobId">
+      <label>Your Proposal</label>
+      <textarea name="cover" required placeholder="Introduce yourself, explain why you're the best fit, and outline your approach..."></textarea>
+      <button type="submit" class="submit-btn"><i class="bi bi-send-fill"></i> Submit Application</button>
+    </form>
+  </div>
 </div>
 
-<%
-}
-}
-%>
-
-</div>
-
-<!-- JOB MODAL -->
-
-<div id="jobModal" class="modal">
-
-<div class="modal-content">
-
-<button class="close-btn" onclick="closeModal()">✖</button>
-
-<h2 id="modalTitle"></h2>
-
-<p><b>Budget:</b> ₹<span id="modalBudget"></span></p>
-<p><b>Duration:</b> <span id="modalDuration"></span></p>
-<p><b>Freelancer Level:</b> <span id="modalLevel"></span></p>
-<p><b>Complexity:</b> <span id="modalComplexity"></span></p>
-
-<h3>Description</h3>
-<p id="modalDescription"></p>
-
-</div>
-
-</div>
-
-<!-- APPLY JOB MODAL -->
-
-<div id="applyModal" class="modal">
-
-<div class="modal-content">
-
-<button class="close-btn" onclick="closeApplyModal()">✖</button>
-
-<h2>Apply for this Job</h2>
-
-<form action="ApplyJobServlet" method="post">
-
-<input type="hidden" name="jobId" id="applyJobId">
-
-<label><b>Proposal</b></label>
-
-<textarea name="cover" required
-style="width:100%;height:120px;margin-top:10px;padding:10px;"></textarea>
-
-<br><br>
-
-<button class="btn" type="submit">Submit Application</button>
-
-</form>
-
-</div>
-
+<!-- ══ RESOURCE MODAL ══ -->
+<div id="rmO" class="mo">
+  <div class="mb">
+    <button class="mc" onclick="closeRM()"><i class="bi bi-x"></i></button>
+    <div id="rmB"></div>
+  </div>
 </div>
 
 <script>
+/* Navbar scroll shadow */
+window.addEventListener('scroll', function() {
+  document.getElementById('nav').classList.toggle('sc', window.scrollY > 30);
+});
 
-let currentJobId = 0;
+/* Reveal on scroll */
+var obs = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) { e.target.classList.add('on'); obs.unobserve(e.target); }
+  });
+}, { threshold: 0.08 });
+document.querySelectorAll('.rv').forEach(function(el) { obs.observe(el); });
 
-function openModal(id,title,budget,duration,level,complexity,description){
-
-currentJobId = id;
-
-document.getElementById("modalTitle").innerText = title;
-document.getElementById("modalBudget").innerText = budget;
-document.getElementById("modalDuration").innerText = duration;
-document.getElementById("modalLevel").innerText = level;
-document.getElementById("modalComplexity").innerText = complexity;
-document.getElementById("modalDescription").innerText = description;
-
-document.getElementById("jobModal").style.display="flex";
+/* Card row scroll */
+function scrollRow(id, dir) {
+  document.getElementById(id).scrollBy({ left: dir * 380, behavior: 'smooth' });
 }
 
-function closeModal(){
-document.getElementById("jobModal").style.display="none";
+/* Job detail modal */
+function openJM(b) {
+  document.getElementById('jmT').textContent  = b.getAttribute('data-title');
+  document.getElementById('jmB').textContent  = b.getAttribute('data-budget');
+  document.getElementById('jmD').textContent  = b.getAttribute('data-dur');
+  document.getElementById('jmL').textContent  = b.getAttribute('data-level');
+  document.getElementById('jmC').textContent  = b.getAttribute('data-comp');
+  document.getElementById('jmDe').textContent = b.getAttribute('data-desc');
+  document.getElementById('jmO').classList.add('open');
 }
+function closeJM() { document.getElementById('jmO').classList.remove('open'); }
+document.getElementById('jmO').addEventListener('click', function(e) { if (e.target === this) closeJM(); });
 
-function openApplyModal(jobId){
-
-document.getElementById("applyJobId").value = jobId;
-document.getElementById("applyModal").style.display="flex";
-
+/* Apply modal */
+function openApplyModal(jobId) {
+  document.getElementById('applyJobId').value = jobId;
+  document.getElementById('applyO').classList.add('open');
 }
+function closeApplyModal() { document.getElementById('applyO').classList.remove('open'); }
+document.getElementById('applyO').addEventListener('click', function(e) { if (e.target === this) closeApplyModal(); });
 
-function closeApplyModal(){
-document.getElementById("applyModal").style.display="none";
+/* Resource modal */
+var res = {
+  winMore: {
+    title: 'Win More Projects', icon: 'bi-trophy-fill', color: '#10b981', bg: '#f0fdf4',
+    items: [
+      { t: 'Personalise every proposal', d: 'Reference the client\'s job description specifically — generic proposals are ignored.' },
+      { t: 'Lead with your value', d: 'State what you can deliver, not just your experience.' },
+      { t: 'Keep it concise', d: 'Clients read dozens of proposals. Short, punchy, and relevant wins.' }
+    ]
+  },
+  earnings: {
+    title: 'Manage Earnings', icon: 'bi-wallet2', color: '#06b6d4', bg: '#ecfeff',
+    items: [
+      { t: 'Escrow protection', d: 'Client funds are held securely until you deliver and they approve.' },
+      { t: 'Milestone billing', d: 'Break large projects into milestones for faster, partial payments.' },
+      { t: 'Instant withdrawals', d: 'Transfer your balance to your bank or UPI at any time.' }
+    ]
+  },
+  profile: {
+    title: 'Build Your Profile', icon: 'bi-person-badge-fill', color: '#8b5cf6', bg: '#f5f3ff',
+    items: [
+      { t: 'Complete every field', d: 'Profiles at 100% get 3× more client views and invitations.' },
+      { t: 'Showcase your skills', d: 'Add relevant skills with proficiency levels clients can filter by.' },
+      { t: 'Write a strong bio', d: 'Explain who you help, how you help them, and what makes you different.' }
+    ]
+  }
+};
+
+function openRM(t) {
+  var r = res[t];
+  var h = '<div class="mtp"><div style="display:flex;align-items:center;gap:9px;margin-bottom:3px;">'
+        + '<div style="width:32px;height:32px;border-radius:8px;background:' + r.bg + ';display:flex;align-items:center;justify-content:center;font-size:15px;color:' + r.color + ';">'
+        + '<i class="bi ' + r.icon + '"></i></div>'
+        + '<div class="mtt">' + r.title + '</div></div><div class="mts">Resource Guide</div></div>';
+  r.items.forEach(function(i) {
+    h += '<div style="padding:10px 0;border-bottom:1px solid #f3f4f6;">'
+       + '<div style="font-weight:700;font-size:13px;color:#1f2937;margin-bottom:3px;">' + i.t + '</div>'
+       + '<div style="font-size:12.5px;color:#9ca3af;line-height:1.6;">' + i.d + '</div></div>';
+  });
+  document.getElementById('rmB').innerHTML = h;
+  document.getElementById('rmO').classList.add('open');
 }
-
+function closeRM() { document.getElementById('rmO').classList.remove('open'); }
+document.getElementById('rmO').addEventListener('click', function(e) { if (e.target === this) closeRM(); });
 </script>
-
 </body>
 </html>

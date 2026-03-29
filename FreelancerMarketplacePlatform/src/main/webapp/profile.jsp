@@ -418,28 +418,34 @@
   </div>
 </footer>
 
-    <!-- intl-tel-input JS -->
-    <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.7.3/build/js/intlTelInput.min.js"></script>
-    <script>
-        const phoneInput = document.querySelector("#phoneInput");
-        const phoneHidden = document.querySelector("#phoneHidden");
+ <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@23.7.3/build/js/intlTelInput.min.js"></script>
+<script>
+window.addEventListener("load", function () {
 
-        const iti = window.intlTelInput(phoneInput, {
-            initialCountry: "auto",
-            geoIpLookup: function(callback) {
-                fetch("https://ipapi.co/json")
-                    .then(res => res.json())
-                    .then(data => callback(data.country_code))
-                    .catch(() => callback("us"));
-            },
-            loadUtilsOnInit: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.7.3/build/js/utils.js",
-        });
+    const phoneInput  = document.querySelector("#phoneInput");
+    const phoneHidden = document.querySelector("#phoneHidden");
 
-        // Before form submits, copy the full international number into the hidden input
-        document.querySelector("#profileForm").addEventListener("submit", function () {
-            phoneHidden.value = iti.getNumber();
-        });
-    </script>
+    const iti = window.intlTelInput(phoneInput, {
+        initialCountry: "in",
+        utilsScript: "https://cdn.jsdelivr.net/npm/intl-tel-input@23.7.3/build/js/utils.js"
+    });
+
+    // Restore saved number
+    const savedPhone = phoneInput.value.trim();
+    if (savedPhone) {
+        iti.setNumber(savedPhone);
+    }
+
+    document.querySelector("#profileForm").addEventListener("submit", function () {
+
+        const fullNumber = iti.getNumber(); // 🔥 important
+        console.log("Submitting:", fullNumber);
+
+        phoneHidden.value = fullNumber;
+    });
+
+});
+</script>
 
 </body>
 </html>
