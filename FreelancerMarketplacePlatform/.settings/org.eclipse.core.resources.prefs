@@ -1,5 +1,6 @@
 eclipse.preferences.version=1
 encoding//src/main/webapp/appliedjob.jsp=UTF-8
+encoding//src/main/webapp/freelancerGrowth.jsp=UTF-8
 encoding//src/main/webapp/freelancerWallet.jsp=UTF-8
 encoding//src/main/webapp/freelancer_home.jsp=UTF-8
 encoding//src/main/webapp/post_job_budget.jsp=UTF-8
@@ -7,4 +8,5 @@ encoding//src/main/webapp/post_job_details.jsp=UTF-8
 encoding//src/main/webapp/post_job_skills.jsp=UTF-8
 encoding//src/main/webapp/profile.jsp=UTF-8
 encoding//src/main/webapp/wallet.jsp=UTF-8
+encoding//src/main/webapp/walletDashboard.jsp=UTF-8
 encoding/<project>=UTF-8

@@ -388,20 +388,18 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
       <span class="nl">Deliver Work <span class="ca">&#9660;</span></span>
       <div class="dd">
         <a href="#"><i class="bi bi-person-workspace"></i> My Projects</a>
-        <a href="ChatServlet"><i class="bi bi-chat-dots"></i> Messages</a>
       </div>
     </div>
     <div class="ni">
       <span class="nl">Finances <span class="ca">&#9660;</span></span>
       <div class="dd">
-        <a href="FreelancerWalletServlet"><i class="bi bi-wallet2"></i> My Earnings</a>
+        <a href="FreelancerGrowthServlet"><i class="bi bi-wallet2"></i> My Earnings</a>
       </div>
     </div>
   </div>
 
   <div class="nr">
     <a href="FreelancerNotificationServlet" class="nibtn"><i class="bi bi-bell"></i><span class="nbadge"></span></a>
-    <a href="ChatServlet" class="nibtn"><i class="bi bi-chat-dots"></i></a>
     <a href="FreelancerWalletServlet" class="nibtn"><i class="bi bi-wallet2"></i></a>
     <a href="FreelancerProfileServlet" class="nprof">
       <div class="navtr"><%= profile.getName().substring(0,1).toUpperCase() %></div>

@@ -415,8 +415,8 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
     <div class="ni"><span class="nl">Manage Work <span class="ca">&#9660;</span></span>
       <div class="dd"><a href="ClientJobsServlet"><i class="bi bi-briefcase"></i> My Jobs</a></div>
     </div>
-    <div class="ni"><span class="nl">Reports <span class="ca">&#9660;</span></span>
-      <div class="dd"><a href="#"><i class="bi bi-bar-chart-line"></i> Weekly Summary</a></div>
+    <div class="ni"><span class="nl">Finances <span class="ca">&#9660;</span></span>
+      <div class="dd"><a href="WalletDashboardServlet"><i class="bi bi-bar-chart-line"></i> Weekly Summary</a></div>
     </div>
     
   </div>
