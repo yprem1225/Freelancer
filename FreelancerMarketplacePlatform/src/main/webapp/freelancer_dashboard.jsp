@@ -351,6 +351,22 @@
                     <label class="form-label">Professional Biography</label>
                     <textarea class="form-control" name="bio" placeholder="Describe your background, projects, and what you bring to the table..."><%= profile.getBio()==null?"":profile.getBio() %></textarea>
                 </div>
+                <div class="form-group">
+    <label class="form-label">
+        <i class="bi bi-linkedin" style="color:#0077b5; margin-right:5px;"></i>
+        LinkedIn Profile URL
+    </label>
+    <div style="position:relative;">
+        <span style="position:absolute; left:14px; top:50%; transform:translateY(-50%); 
+                     color:var(--g400); font-size:13px; pointer-events:none;">
+            linkedin.com/in/
+        </span>
+        <input type="url" class="form-control" name="linkedin"
+               style="padding-left: 130px;"
+               placeholder="your-profile-slug"
+               value="<%= profile.getLinkedinUrl()==null?"":profile.getLinkedinUrl() %>">
+    </div>
+</div>
 
                 <button type="submit" class="btn-update">
                     <i class="bi bi-shield-check"></i> Update Profile

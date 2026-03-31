@@ -12,6 +12,7 @@ public class FreelancerProfile {
     private int experienceYears;
     private double hourlyRate;
     private String bio;
+    private String linkedinUrl;
     
     private int profileCompleted;
 	public int getId() {
@@ -79,6 +80,12 @@ public class FreelancerProfile {
 	}
 	public void setProfileCompleted(int profileCompleted) {
 		this.profileCompleted = profileCompleted;
+	}
+	public String getLinkedinUrl() {
+		return linkedinUrl;
+	}
+	public void setLinkedinUrl(String linkedinUrl) {
+		this.linkedinUrl = linkedinUrl;
 	}
     
 

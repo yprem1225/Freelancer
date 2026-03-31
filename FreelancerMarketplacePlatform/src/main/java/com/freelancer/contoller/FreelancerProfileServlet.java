@@ -72,6 +72,7 @@ public class FreelancerProfileServlet extends HttpServlet {
 		p.setPhone(request.getParameter("phone"));
 		p.setTitle(request.getParameter("title"));
 		p.setSkills(request.getParameter("skills"));
+		p.setLinkedinUrl(request.getParameter("linkedin"));
 		
 		if(exp != null && !exp.trim().isEmpty()){
 		    p.setExperienceYears(Integer.parseInt(exp));

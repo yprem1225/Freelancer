@@ -413,7 +413,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
       <div class="dd"><a href="#"><i class="bi bi-plus-circle"></i> Post a Job</a><a href="#"><i class="bi bi-search"></i> Search Talent</a><a href="#"><i class="bi bi-person-check"></i> Talent Hired</a></div>
     </div>
     <div class="ni"><span class="nl">Manage Work <span class="ca">&#9660;</span></span>
-      <div class="dd"><a href="#"><i class="bi bi-briefcase"></i> My Jobs</a><a href="#"><i class="bi bi-file-earmark-text"></i> Contracts</a></div>
+      <div class="dd"><a href="ClientJobsServlet"><i class="bi bi-briefcase"></i> My Jobs</a></div>
     </div>
     <div class="ni"><span class="nl">Reports <span class="ca">&#9660;</span></span>
       <div class="dd"><a href="#"><i class="bi bi-bar-chart-line"></i> Weekly Summary</a></div>
