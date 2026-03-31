@@ -293,7 +293,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 .rc:hover::after{transform:scaleX(1);}
 .ri{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:14px;transition:transform .25s;}
 .rc:hover .ri{transform:scale(1.12) rotate(-5deg);}
-.rig{background:#f0fdf4;color:var(--ok);}
+.rig{background:#f0fdf4;color:var(--ok);}//
 .ric{background:#ecfeff;color:var(--cyan);}
 .riv{background:#f5f3ff;color:var(--violet);}
 .rib{background:var(--bluelt);color:var(--blue);}
