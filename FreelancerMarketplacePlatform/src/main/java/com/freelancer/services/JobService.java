@@ -451,6 +451,49 @@ public class JobService {
     }
     
     
+    // completed jobs method
+    
+    @SuppressWarnings("unchecked")
+    public List<Job> getCompletedJobsByUser(int userId) throws SQLException {
+
+        List<Job> jobs = new ArrayList<>();
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            String sql = "SELECT * FROM jobs WHERE status='COMPLETED' AND user_id=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            JobSkillService skillservice = new JobSkillService();
+
+            while (rs.next()) {
+                Job job = new Job();
+
+                job.setJobId(rs.getInt("job_id"));
+                job.setUserId(rs.getInt("user_id"));
+                job.setTitle(rs.getString("title"));
+                job.setComplexity(rs.getString("complexity"));
+                job.setDuration(rs.getString("duration"));
+                job.setFreelancerLevel(rs.getString("freelancer_level"));
+                job.setBudget(rs.getString("budget"));
+                job.setDescription(rs.getString("description"));
+                job.setStatus(rs.getString("status"));
+
+                job.setSkills(skillservice.getSkillsByJobId(job.getJobId()));
+
+                jobs.add(job);
+            }
+
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return jobs;
+    }
+    
     
     
     

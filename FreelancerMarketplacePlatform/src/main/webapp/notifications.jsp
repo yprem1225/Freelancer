@@ -175,7 +175,17 @@ List<Notification> list = (List<Notification>)request.getAttribute("notification
             gap: 8px;
             transition: all 0.2s;
         }
-
+		.btn-home {
+            margin-left: auto;
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 8px 16px;
+            background: #fff; border: 1.5px solid var(--g200);
+            border-radius: 8px; font-size: 13px; font-weight: 700;
+            color: var(--g600); cursor: pointer; text-decoration: none;
+            transition: all .18s;
+        }
+        .btn-home:hover { border-color: var(--blue); color: var(--blue); background: var(--bluelt); }
+		
         .btn-accept {
             background: var(--ok);
             color: #fff;
@@ -214,6 +224,9 @@ List<Notification> list = (List<Notification>)request.getAttribute("notification
             </svg>
             <span class="logo-txt"><span class="w">Work</span><span class="p">Port</span></span>
         </a>
+        <a href="ClientHomeServlet" class="btn-home">
+            <i class="bi bi-house-door"></i> Back to DashBoard
+        </a>
     </nav>
 
     <div class="container">
@@ -237,10 +250,6 @@ List<Notification> list = (List<Notification>)request.getAttribute("notification
                 </div>
 
                 <div class="freelancer-info">
-                    <div class="info-row">
-                        <b>Freelancer Title</b>
-                        <%= n.getFreelancerTitle() %>
-                    </div>
                     <div class="info-row">
                         <b>Proposal Details</b>
                         <div class="proposal-text">"<%= n.getProposal() %>"</div>
