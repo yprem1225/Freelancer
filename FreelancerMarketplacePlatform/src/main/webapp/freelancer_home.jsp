@@ -602,7 +602,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
             <%= (job.getDescription() != null && !job.getDescription().isEmpty()) ? job.getDescription() : "No description provided." %>
           </div>
           <div class="jcard-actions">
-            <a href="ChatServlet?jobId=<%= job.getJobId() %>" class="bch" style="text-decoration:none;">
+            <a href="FreelancerChatServlet?jobId=<%= job.getJobId() %>" class="bch" style="text-decoration:none;">
               <i class="bi bi-chat-dots-fill"></i> Open Chat
             </a>
             <button class="bv"
