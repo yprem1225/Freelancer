@@ -376,53 +376,95 @@ let aiDebounce;
 const searchInput = document.getElementById("skillSearch");
 const allPills    = document.querySelectorAll(".skill-pill");
 
-searchInput.addEventListener("keyup", function(){
-  const val = this.value.toLowerCase().trim();
+// ── Filter existing pills on search ───────────────────────
+searchInput.addEventListener("keyup", function () {
+    const val = this.value.toLowerCase().trim();
 
-  // filter existing pills
-  allPills.forEach(pill => {
-    pill.style.display = pill.innerText.toLowerCase().includes(val) ? "inline-block" : "none";
-  });
+    allPills.forEach(pill => {
+        pill.style.display =
+            pill.innerText.toLowerCase().includes(val)
+                ? "inline-block" : "none";
+    });
 
-  // AI suggestions after 600ms pause
-  clearTimeout(aiDebounce);
-  if(val.length < 3){ document.getElementById("aiSuggestions").style.display="none"; return; }
+    clearTimeout(aiDebounce);
 
-  aiDebounce = setTimeout(() => fetchAISkills(val), 600);
+    if (val.length < 3) {
+        document.getElementById("aiSuggestions").style.display = "none";
+        return;
+    }
+
+    // Wait 600ms after user stops typing
+    aiDebounce = setTimeout(() => fetchAISkills(val), 600);
 });
 
+// ── Fetch AI skill suggestions ─────────────────────────────
 async function fetchAISkills(query) {
     const container = document.getElementById("aiSkillsContainer");
     const box       = document.getElementById("aiSuggestions");
-    container.innerHTML = '<span style="font-size:13px;color:var(--g400);"><i class="bi bi-hourglass-split"></i> Thinking...</span>';
+
+    // Show loading state
+    container.innerHTML =
+        '<span style="font-size:13px;color:var(--g400);">'
+      + '<i class="bi bi-hourglass-split"></i> Thinking...</span>';
     box.style.display = "block";
 
     try {
-        const res  = await fetch("AISkillServlet?query=" + encodeURIComponent(query));
+        const res  = await fetch("AISkillServlet?query="
+                               + encodeURIComponent(query));
         const data = await res.json();
-        const text = data.content[0].text.trim();
+
+        // Handle error from servlet
+        if (data.error) {
+            container.innerHTML =
+                '<span style="font-size:13px;color:var(--g400);">'
+              + 'Could not load suggestions.</span>';
+            return;
+        }
+
+        // Parse the skills array from response
+        let text = data.content[0].text.trim();
+
+        // Strip backticks just in case
+        text = text.replace(/```json/gi, "")
+                   .replace(/```/g, "")
+                   .trim();
+
         const skills = JSON.parse(text);
 
+        if (!Array.isArray(skills) || skills.length === 0) {
+            container.innerHTML =
+                '<span style="font-size:13px;color:var(--g400);">'
+              + 'No suggestions found.</span>';
+            return;
+        }
+
+        // Render skill pills
         container.innerHTML = "";
-        skills.forEach(function(skill) {
-            const label = document.createElement("label");
-            label.className = "skill-pill";
-            label.innerHTML =
-                '<input type="checkbox" name="skills" value="' + skill + '" onchange="updateCount()">' +
-                '<span>' + skill + '</span>';
+        skills.forEach(function (skill) {
+            const label       = document.createElement("label");
+            label.className   = "skill-pill";
+            label.innerHTML   =
+                '<input type="checkbox" name="skills" '
+              + 'value="' + skill + '" onchange="updateCount()">'
+              + '<span>' + skill + '</span>';
             container.appendChild(label);
         });
 
-    } catch(e) {
-        container.innerHTML = '<span style="font-size:13px;color:var(--g400);">Could not load suggestions.</span>';
+    } catch (e) {
+        console.error("AI skill fetch error:", e);
+        container.innerHTML =
+            '<span style="font-size:13px;color:var(--g400);">'
+          + 'Could not load suggestions.</span>';
     }
 }
-}
 
-function updateCount(){
-  const n = document.querySelectorAll("input[name='skills']:checked").length;
-  document.getElementById("selectedCount").innerHTML =
-    '<i class="bi bi-check2-circle"></i> ' + n + ' skill' + (n !== 1 ? 's' : '') + ' selected';
+// ── Update selected count badge ───────────────────────────
+function updateCount() {
+    const n = document.querySelectorAll(
+                "input[name='skills']:checked").length;
+    document.getElementById("selectedCount").innerHTML =
+        '<i class="bi bi-check2-circle"></i> '
+      + n + ' skill' + (n !== 1 ? 's' : '') + ' selected';
 }
 </script>
 

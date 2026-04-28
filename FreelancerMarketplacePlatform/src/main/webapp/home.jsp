@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="com.model.ClientProfile,java.util.List,com.model.Job,com.model.JobSkill" %>
 <%@ page import="com.freelancer.services.EscrowService" %>
+<%@ page import="com.freelancer.services.JobSkillService" %>
+
 <%
 ClientProfile profile = (ClientProfile) request.getAttribute("profile");
 if (profile == null) { response.sendRedirect("login.jsp"); return; }
@@ -598,13 +600,22 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
             <button class="jcard-menu">&#8230;</button>
           </div>
           <div class="jcard-meta">
-            <span><i class="bi bi-currency-rupee"></i>&#8377;<%= job.getBudget() %></span>
+            <span><i class="bi bi-currency-dollar"></i><%= job.getBudget() %></span>
             <span><i class="bi bi-clock"></i><%= job.getDuration() %></span>
           </div>
           <div class="jcard-desc"><%= (job.getDescription()!=null&&!job.getDescription().isEmpty())?job.getDescription():"No description provided." %></div>
           <div class="jcard-actions">
-            <button class="bv" data-title="<%= st %>" data-budget="<%= sb %>" data-dur="<%= sd %>" data-level="<%= sl %>" data-comp="<%= sc2 %>" data-desc="<%= sde %>" onclick="openJM(this)"><i class="bi bi-eye"></i> View</button>
-            <form action="DeleteJobServlet" method="post" style="margin:0;flex:1;" onsubmit="return confirm('Remove this project?');">
+            <%
+				JobSkillService skillSvcA = new JobSkillService();
+				java.util.List<JobSkill> jobSkillsA = skillSvcA.getSkillsByJobId(job.getJobId());
+				StringBuilder sbSkA = new StringBuilder();
+				for (int si = 0; si < jobSkillsA.size(); si++) {
+				    if (si > 0) sbSkA.append(",");
+				    sbSkA.append(jobSkillsA.get(si).getSkillName().replace("\"","&quot;").replace("'","&#39;"));
+				}
+				%>
+				<button class="bv" data-title="<%= st %>" data-budget="<%= sb %>" data-dur="<%= sd %>" data-level="<%= sl %>" data-comp="<%= sc2 %>" data-desc="<%= sde %>" data-skills="<%= sbSkA.toString() %>" onclick="openJM(this)"><i class="bi bi-eye"></i> View</button>
+				            <form action="DeleteJobServlet" method="post" style="margin:0;flex:1;" onsubmit="return confirm('Remove this project?');">
               <input type="hidden" name="jobId" value="<%= job.getJobId() %>">
               <button type="submit" class="bd" style="width:100%;"><i class="bi bi-trash3"></i> Remove</button>
             </form>
@@ -683,7 +694,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
 
         <%-- Meta row --%>
         <div class="jcard-meta">
-          <span><i class="bi bi-currency-rupee"></i>&#8377;<%= job.getBudget() %></span>
+          <span><i class="bi bi-currency-dollar"></i><%= job.getBudget() %></span>
           <span><i class="bi bi-clock"></i><%= job.getDuration() %></span>
           <% if (escrowHeld) { %>
             <span style="background:#fef9c3;color:#854d0e;border-color:#fef08a;">
@@ -711,11 +722,20 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
             <i class="bi bi-chat-dots-fill"></i> Chat
           </a>
 
-          <%-- Details --%>
+         <%
+JobSkillService skillSvcO = new JobSkillService();
+java.util.List<JobSkill> jobSkillsO = skillSvcO.getSkillsByJobId(job.getJobId());
+StringBuilder sbSkO = new StringBuilder();
+for (int si = 0; si < jobSkillsO.size(); si++) {
+    if (si > 0) sbSkO.append(",");
+    sbSkO.append(jobSkillsO.get(si).getSkillName().replace("\"","&quot;").replace("'","&#39;"));
+}
+%>
           <button class="bv"
             data-title="<%= st %>" data-budget="<%= sb %>"
             data-dur="<%= sd %>"  data-level="<%= sl %>"
             data-comp="<%= sc2 %>" data-desc="<%= sde %>"
+            data-skills="<%= sbSkO.toString() %>"
             onclick="openJM(this)">
             <i class="bi bi-eye"></i> Details
           </button>
@@ -730,7 +750,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
     onmouseover="this.style.background='#f59e0b';this.style.color='#fff';this.style.borderColor='#d97706';"
     onmouseout="this.style.background='#fef9c3';this.style.color='#92400e';this.style.borderColor='#fbbf24';">
     
-    Release &#8377;<%= escrowAmt %>
+    Release $<%= escrowAmt %>
 </button>
             </form>
           <% } %>
@@ -810,13 +830,17 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
   <div class="mb">
     <button class="mc" onclick="closeJM()"><i class="bi bi-x"></i></button>
     <div class="mtp"><div class="mtt" id="jmT"></div><div class="mts">Project Overview</div></div>
-    <div class="dr"><div class="di"><i class="bi bi-currency-rupee"></i></div><div><div class="dl">Budget</div><div class="dv">&#8377;<span id="jmB"></span></div></div></div>
+    <div class="dr"><div class="di"><i class="bi bi-currency-dollar"></i></div><div><div class="dl">Budget</div><div class="dv">$<span id="jmB"></span></div></div></div>
     <div class="dr"><div class="di"><i class="bi bi-clock"></i></div><div><div class="dl">Duration</div><div class="dv" id="jmD"></div></div></div>
     <div class="dr"><div class="di"><i class="bi bi-person-badge"></i></div><div><div class="dl">Freelancer Level</div><div class="dv" id="jmL"></div></div></div>
     <div class="dr"><div class="di"><i class="bi bi-layers"></i></div><div><div class="dl">Complexity</div><div class="dv" id="jmC"></div></div></div>
     <div class="dr" style="flex-direction:column;gap:0;">
       <div style="display:flex;align-items:center;gap:9px;"><div class="di"><i class="bi bi-file-text"></i></div><div class="dl">Description</div></div>
       <div class="dd2" id="jmDe"></div>
+    </div>
+    <div class="dr" style="flex-direction:column;gap:6px;">
+      <div style="display:flex;align-items:center;gap:9px;"><div class="di"><i class="bi bi-tags"></i></div><div class="dl">Required Skills</div></div>
+      <div id="jmSk" style="padding-left:37px;display:flex;flex-wrap:wrap;gap:6px;"></div>
     </div>
   </div>
 </div>
@@ -838,7 +862,29 @@ function openRM(t){var r=res[t];var h='<div class="mtp"><div style="display:flex
 function closeRM(){document.getElementById('rmO').classList.remove('open');}
 document.getElementById('rmO').addEventListener('click',function(e){if(e.target===this)closeRM();});
 
-function openJM(b){document.getElementById('jmT').textContent=b.getAttribute('data-title');document.getElementById('jmB').textContent=b.getAttribute('data-budget');document.getElementById('jmD').textContent=b.getAttribute('data-dur');document.getElementById('jmL').textContent=b.getAttribute('data-level');document.getElementById('jmC').textContent=b.getAttribute('data-comp');document.getElementById('jmDe').textContent=b.getAttribute('data-desc');document.getElementById('jmO').classList.add('open');}
+function openJM(b){
+	  document.getElementById('jmT').textContent=b.getAttribute('data-title');
+	  document.getElementById('jmB').textContent=b.getAttribute('data-budget');
+	  document.getElementById('jmD').textContent=b.getAttribute('data-dur');
+	  document.getElementById('jmL').textContent=b.getAttribute('data-level');
+	  document.getElementById('jmC').textContent=b.getAttribute('data-comp');
+	  document.getElementById('jmDe').textContent=b.getAttribute('data-desc');
+	  var sk=b.getAttribute('data-skills')||'';
+	  var skBox=document.getElementById('jmSk');
+	  skBox.innerHTML='';
+	  if(sk.trim()){
+	    sk.split(',').forEach(function(s){
+	      if(!s.trim())return;
+	      var span=document.createElement('span');
+	      span.textContent=s.trim();
+	      span.style.cssText='display:inline-block;padding:4px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;font-size:12px;color:#15803d;font-weight:600;';
+	      skBox.appendChild(span);
+	    });
+	  } else {
+	    skBox.innerHTML='<span style="color:#9ca3af;font-size:12.5px;">No skills listed.</span>';
+	  }
+	  document.getElementById('jmO').classList.add('open');
+	}
 function closeJM(){document.getElementById('jmO').classList.remove('open');}
 document.getElementById('jmO').addEventListener('click',function(e){if(e.target===this)closeJM();});
 </script>

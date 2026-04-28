@@ -2,7 +2,8 @@
 <%@ page import="com.model.FreelancerProfile" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.model.Job" %>
-
+<%@ page import="com.model.JobSkill" %>
+<%@ page import="com.freelancer.services.JobSkillService" %>
 <%
 FreelancerProfile profile = (FreelancerProfile) request.getAttribute("profile");
 if (profile == null) { response.sendRedirect("login.jsp"); return; }
@@ -590,7 +591,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
             <button class="jcard-menu">&#8230;</button>
           </div>
           <div class="jcard-meta">
-            <span><i class="bi bi-currency-rupee"></i>&#8377;<%= job.getBudget() %></span>
+            <span><i class="bi bi-currency-dollar"></i><%= job.getBudget() %></span>
             <span><i class="bi bi-clock"></i><%= job.getDuration() %></span>
             <% if (job.getFreelancerLevel() != null && !job.getFreelancerLevel().isEmpty()) { %>
             <span><i class="bi bi-bar-chart"></i><%= job.getFreelancerLevel() %></span>
@@ -603,16 +604,34 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
             <a href="FreelancerChatServlet?jobId=<%= job.getJobId() %>" class="bch" style="text-decoration:none;">
               <i class="bi bi-chat-dots-fill"></i> Open Chat
             </a>
-            <button class="bv"
-              data-title="<%= (job.getTitle()!=null)?job.getTitle().replace("'","\\'"):"" %>"
-              data-budget="<%= job.getBudget() %>"
-              data-dur="<%= (job.getDuration()!=null)?job.getDuration():"" %>"
-              data-level="<%= (job.getFreelancerLevel()!=null)?job.getFreelancerLevel():"" %>"
-              data-comp="<%= (job.getComplexity()!=null)?job.getComplexity():"" %>"
-              data-desc="<%= (job.getDescription()!=null)?job.getDescription().replace("'","\\'"):"" %>"
-              onclick="openJM(this)">
-              <i class="bi bi-eye"></i> Details
-            </button>
+            <%
+String stW  = (job.getTitle()!=null) ? job.getTitle().replace("&","&amp;").replace("\"","&quot;") : "";
+String sbW  = String.valueOf(job.getBudget());
+String sdW  = (job.getDuration()!=null) ? job.getDuration().replace("\"","&quot;") : "";
+String slW  = (job.getFreelancerLevel()!=null) ? job.getFreelancerLevel().replace("\"","&quot;") : "";
+String sc2W = (job.getComplexity()!=null) ? job.getComplexity().replace("\"","&quot;") : "";
+String sdeW = (job.getDescription()!=null) ? job.getDescription().replace("&","&amp;").replace("\"","&quot;").replace("<","&lt;") : "";
+
+JobSkillService skillSvcW = new JobSkillService();
+java.util.List jobSkillsW = skillSvcW.getSkillsByJobId(job.getJobId());
+StringBuilder sbSkW = new StringBuilder();
+for (int si = 0; si < jobSkillsW.size(); si++) {
+    if (si > 0) sbSkW.append(",");
+    sbSkW.append(((JobSkill) jobSkillsW.get(si)).getSkillName()
+        .replace("\"","&quot;").replace("'","&#39;"));
+}
+%>
+<button class="bv"
+    data-title="<%= stW %>"
+    data-budget="<%= sbW %>"
+    data-dur="<%= sdW %>"
+    data-level="<%= slW %>"
+    data-comp="<%= sc2W %>"
+    data-desc="<%= sdeW %>"
+    data-skills="<%= sbSkW.toString() %>"
+    onclick="openJM(this)">
+    <i class="bi bi-eye"></i> Details
+</button>
           </div>
         </div>
       <% } } %>
@@ -644,11 +663,12 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
         </div>
       <% } else {
            for (Job job : activeJobs) {
-             String jt  = (job.getTitle()       != null) ? job.getTitle().replace("'", "\\'")       : "";
-             String jd  = (job.getDuration()    != null) ? job.getDuration()                        : "";
-             String jl  = (job.getFreelancerLevel() != null) ? job.getFreelancerLevel()             : "";
-             String jc  = (job.getComplexity()  != null) ? job.getComplexity()                     : "";
-             String jde = (job.getDescription() != null) ? job.getDescription().replace("'", "\\'") : "";
+        	   String st  = (job.getTitle()!=null) ? job.getTitle().replace("&","&amp;").replace("\"","&quot;") : "";
+        	   String sb  = String.valueOf(job.getBudget());
+        	   String sd  = (job.getDuration()!=null) ? job.getDuration().replace("\"","&quot;") : "";
+        	   String sl  = (job.getFreelancerLevel()!=null) ? job.getFreelancerLevel().replace("\"","&quot;") : "";
+        	   String sc2 = (job.getComplexity()!=null) ? job.getComplexity().replace("\"","&quot;") : "";
+        	   String sde = (job.getDescription()!=null) ? job.getDescription().replace("&","&amp;").replace("\"","&quot;").replace("<","&lt;") : "";
       %>
         <div class="jcard">
           <div class="jcard-top">
@@ -660,7 +680,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
             <button class="jcard-menu">&#8230;</button>
           </div>
           <div class="jcard-meta">
-            <span><i class="bi bi-currency-rupee"></i>&#8377;<%= job.getBudget() %></span>
+            <span><i class="bi bi-currency-dollar"></i><%= job.getBudget() %></span>
             <span><i class="bi bi-clock"></i><%= job.getDuration() %></span>
             <% if (job.getFreelancerLevel() != null && !job.getFreelancerLevel().isEmpty()) { %>
             <span><i class="bi bi-bar-chart"></i><%= job.getFreelancerLevel() %></span>
@@ -670,13 +690,27 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
             <%= (job.getDescription() != null && !job.getDescription().isEmpty()) ? job.getDescription() : "No description provided." %>
           </div>
           <div class="jcard-actions">
-            <button class="bv"
-              data-title="<%= jt %>" data-budget="<%= job.getBudget() %>"
-              data-dur="<%= jd %>" data-level="<%= jl %>"
-              data-comp="<%= jc %>" data-desc="<%= jde %>"
-              onclick="openJM(this)">
-              <i class="bi bi-eye"></i> View
-            </button>
+           <%
+JobSkillService skillSvc = new JobSkillService();
+java.util.List jobSkills = skillSvc.getSkillsByJobId(job.getJobId());
+StringBuilder sbSk = new StringBuilder();
+for (int si = 0; si < jobSkills.size(); si++) {
+    if (si > 0) sbSk.append(",");
+    sbSk.append(((JobSkill) jobSkills.get(si)).getSkillName()
+        .replace("\"","&quot;").replace("'","&#39;"));
+}
+%>
+<button class="bv"
+    data-title="<%= st %>"
+    data-budget="<%= sb %>"
+    data-dur="<%= sd %>"
+    data-level="<%= sl %>"
+    data-comp="<%= sc2 %>"
+    data-desc="<%= sde %>"
+    data-skills="<%= sbSk.toString() %>"
+    onclick="openJM(this)">
+    <i class="bi bi-eye"></i> View
+</button>
             <% if (profileComplete) { %>
             <button class="ba" onclick="openApplyModal('<%= job.getJobId() %>')">
               <i class="bi bi-send-fill"></i> Apply
@@ -767,7 +801,7 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
       <div class="mtt" id="jmT"></div>
       <div class="mts">Project Overview</div>
     </div>
-    <div class="dr"><div class="di"><i class="bi bi-currency-rupee"></i></div><div><div class="dl">Budget</div><div class="dv">&#8377;<span id="jmB"></span></div></div></div>
+    <div class="dr"><div class="di"><i class="bi bi-currency-dollar"></i></div><div><div class="dl">Budget</div><div class="dv">$<span id="jmB"></span></div></div></div>
     <div class="dr"><div class="di"><i class="bi bi-clock"></i></div><div><div class="dl">Duration</div><div class="dv" id="jmD"></div></div></div>
     <div class="dr"><div class="di"><i class="bi bi-person-badge"></i></div><div><div class="dl">Freelancer Level</div><div class="dv" id="jmL"></div></div></div>
     <div class="dr"><div class="di"><i class="bi bi-layers"></i></div><div><div class="dl">Complexity</div><div class="dv" id="jmC"></div></div></div>
@@ -775,6 +809,16 @@ button{font-family:'DM Sans',sans-serif;cursor:pointer;}
       <div style="display:flex;align-items:center;gap:9px;"><div class="di"><i class="bi bi-file-text"></i></div><div class="dl">Description</div></div>
       <div class="dd2" id="jmDe"></div>
     </div>
+
+    <!-- ADD THIS BLOCK -->
+    <div class="dr" style="flex-direction:column;gap:6px;">
+      <div style="display:flex;align-items:center;gap:9px;">
+        <div class="di"><i class="bi bi-tags"></i></div>
+        <div class="dl">Required Skills</div>
+      </div>
+      <div id="jmSk" style="padding-left:37px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+    </div>
+
   </div>
 </div>
 
@@ -824,13 +868,29 @@ function scrollRow(id, dir) {
 
 /* Job detail modal */
 function openJM(b) {
-  document.getElementById('jmT').textContent  = b.getAttribute('data-title');
-  document.getElementById('jmB').textContent  = b.getAttribute('data-budget');
-  document.getElementById('jmD').textContent  = b.getAttribute('data-dur');
-  document.getElementById('jmL').textContent  = b.getAttribute('data-level');
-  document.getElementById('jmC').textContent  = b.getAttribute('data-comp');
-  document.getElementById('jmDe').textContent = b.getAttribute('data-desc');
-  document.getElementById('jmO').classList.add('open');
+    document.getElementById('jmT').textContent  = b.getAttribute('data-title');
+    document.getElementById('jmB').textContent  = b.getAttribute('data-budget');
+    document.getElementById('jmD').textContent  = b.getAttribute('data-dur');
+    document.getElementById('jmL').textContent  = b.getAttribute('data-level');
+    document.getElementById('jmC').textContent  = b.getAttribute('data-comp');
+    document.getElementById('jmDe').textContent = b.getAttribute('data-desc');
+
+    var sk = b.getAttribute('data-skills') || '';
+    var skBox = document.getElementById('jmSk');
+    skBox.innerHTML = '';
+    if (sk.trim()) {
+        sk.split(',').forEach(function(s) {
+            if (!s.trim()) return;
+            var span = document.createElement('span');
+            span.textContent = s.trim();
+            span.style.cssText = 'display:inline-block;padding:4px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:20px;font-size:12px;color:#15803d;font-weight:600;';
+            skBox.appendChild(span);
+        });
+    } else {
+        skBox.innerHTML = '<span style="color:#9ca3af;font-size:12.5px;">No skills listed.</span>';
+    }
+
+    document.getElementById('jmO').classList.add('open');
 }
 function closeJM() { document.getElementById('jmO').classList.remove('open'); }
 document.getElementById('jmO').addEventListener('click', function(e) { if (e.target === this) closeJM(); });
